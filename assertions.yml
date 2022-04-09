@@ -1,0 +1,41 @@
+---
+
+- name: waka waka
+  hosts: all
+  vars_prompt:
+
+    - name: fi_num
+      prompt: What is the FI number? Digits only.
+      private: no
+
+    - name: vlan
+      prompt: What is the VLAN ID?
+      private: no
+
+    - name: ritm
+      prompt: What is the ticket number?
+      private: no
+
+  tasks:
+
+    - name: Assert that FI number is greater than 1000
+      assert:
+        that:
+          - fi_num | int >= 1000
+        success_msg: FI number is greater than 1000
+        fail_msg: FI number must be greater than 1000
+
+    - name: Assert that vlan >= 3500
+      assert:
+        that:
+          - vlan | int >= 3500
+          - vlan | int <= 3900
+        success_msg: VLAN is between 3500 - 3900
+        fail_msg: VLAN must be greater than 3500 and less than 3900
+
+    - name: Assert that ticket number begins with RITM
+      assert:
+        that:
+          - "'RITM' in ritm[:4]"
+        success_msg: Ticket number begins with RITM
+        fail_msg: ticket number must begin with RITM

@@ -1,0 +1,34 @@
+---
+# https://rb.gy/ez6s5m
+# title: Register variables in with_items loop in Ansible playbook
+
+- name: Read some json and loop through it, ya'll
+  hosts: wsl
+
+  tasks:
+    - name: Read me some JSON files
+      get_url:
+        url: "https://{{ item }}"
+        dest: ./
+      with_items:
+        - craigslist.org
+        - www.wikipedia.org
+      register: results
+      delegate_to: localhost
+
+    - name: show output - option 1
+      debug:
+        msg: "{{ item.url }}"
+      loop: "{{ results.results }}"
+      loop_control:
+        label: URL
+
+    - name: show output - option 2
+      debug:
+        msg: "{{ results | json_query('results[].invocation.module_args.url') }}"
+
+    - name: Delete downloaded files
+      file:
+        path: "./index.html"
+        state: absent
+      delegate_to: localhost
