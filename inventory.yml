@@ -1,5 +1,17 @@
 ---
 all:
-  hosts:
-    wsl:
-      ansible_host: 127.0.0.1
+  children:
+    linux:
+      hosts:
+        wsl:
+          ansible_host: 127.0.0.1
+    aci:
+      hosts:
+        apic_pub:
+          ansible_host: sandboxapicdc.cisco.com
+          ansible_user: admin
+          ansible_password: "!v3G@!4@Y"
+        apic_pvt:
+          ansible_host: 10.10.20.14
+          ansible_user: admin
+          ansible_password: C1sco12345

@@ -2,12 +2,13 @@
 # This playbook will create the following:
 # a tenant, vrf, bd, ap, epg, spath, vlan pool, port selector with port block
 # requirements: leaf interface profile must exist and be bound to a leaf profile
-# ansible-playbook aci-create-infra.yml --extra-vars "apic=apic_pvt leaf_int_prof=leaf_1 switch_port=46 vlan_id=1607 playbook_action=query"
+# ansible-playbook aci-create-infra.yml --extra-vars "apic=apic_pvt leaf_profile=leaf_1 leaf_ifp=leaf_1_ifp switch_port=46 vlan_id=1607 playbook_action=query"
 
 - name: "Create, edit, or delete Comcast customer"
   hosts: "{{ apic }}"
   vars:
     verb: "{{ 'Create' if playbook_action == 'present' else 'Delete' if playbook_action == 'absent' else 'Query' }}"
+    rest_action: "{{ 'created,modified' if playbook_action == 'present' else 'deleted' if playbook_action == 'absent' else 'query' }}"
     tenant: jm-tenant
     vrf: jm-vrf
     bd: jm-bd
@@ -26,7 +27,6 @@
         fail_msg: Action must be query, present, or absent
         quiet: yes
       tags: assert
-
 
 # Create tenant
 
@@ -47,7 +47,6 @@
       debug:
         var: tenant_result | json_query('current[].fvTenant.attributes.dn')
 
-
 # Create VRF
 
     - name: "{{ verb }} VRF"
@@ -66,7 +65,6 @@
     - name: Display tenant results
       debug:
         var: vrf_result | json_query('current[].fvCtx.attributes.dn')
-
 
 # create BD
 
@@ -164,7 +162,6 @@
       debug:
         msg: "{{ phy_dom_result | json_query('current[].fvRsDomAtt.attributes.dn') }}"
 
-
 # Create vlan pool encaps block
 
     - name: "{{ verb }} a VLAN pool for encap blocks"
@@ -189,6 +186,56 @@
         var: vlan_encaps_blk_result | json_query('current[].fvnsEncapBlk.attributes.dn')
       tags: vlan
 
+# create leaf interface profile
+
+    - name: "{{ verb }} leaf interface profile"
+      aci_rest:
+        host: "{{ ansible_host }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        validate_certs: no
+
+        path: "/api/node/mo/uni/infra/accportprof-{{ leaf_ifp }}.json"
+        method: post
+        content:
+          infraAccPortP:
+            attributes:
+              dn: "uni/infra/accportprof-{{ leaf_ifp }}"
+              name: "{{ leaf_ifp }}"
+              descr: "ifp for leaf 101 created by Ansible"
+              rn: "accportprof-{{ leaf_ifp }}"
+              status: "{{ rest_action }}"
+      register: leaf_ifp_result
+      tags: leaf_ifp
+
+    - name: Show leaf ifp results
+      debug:
+        var: leaf_ifp_result | json_query('imdata[].infraAccPortP.attributes.[name,descr,dn]')
+      tags: leaf_ifp
+
+# attach leaf interface profile to leaf profile
+
+    - name: "Attach leaf ifp to leaf profile"
+      aci_rest:
+        host: "{{ ansible_host }}"
+        username: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+        validate_certs: no
+
+        path: "/api/node/mo/uni/infra/nprof-{{ leaf_profile }}.json"
+        method: post
+        content:
+          infraRsAccPortP:
+            attributes:
+              tDn: "uni/infra/accportprof-{{ leaf_ifp }}"
+              status: "{{ rest_action }}"
+      register: leaf_profile_result
+      tags: leaf_profile
+
+    - name: Show leaf ifp results
+      debug:
+        var: leaf_profile_result | json_query('imdata[].infraRsAccPortP.attributes.dn')
+      tags: leaf_profile
 
 # Create port block
 
@@ -199,7 +246,7 @@
         password: "{{ ansible_password }}"
         validate_certs: no
 
-        leaf_interface_profile: "{{ leaf_int_prof }}"
+        leaf_interface_profile: "{{ leaf_ifp }}"
         access_port_selector: "jm-server1-sel"
         leaf_port_blk: "jm-server1-blk"
         from_port: "{{ switch_port }}"
