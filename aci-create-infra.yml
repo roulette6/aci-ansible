@@ -4,7 +4,7 @@
 # requirements: leaf interface profile must exist and be bound to a leaf profile
 # ansible-playbook aci-create-infra.yml --extra-vars "apic=apic_pvt leaf_profile=leaf_1 leaf_ifp=leaf_1_ifp switch_port=46 vlan_id=1607 playbook_action=query"
 
-- name: "Create, edit, or delete Comcast customer"
+- name: "Create, edit, or delete ISP customer"
   hosts: "{{ apic }}"
   vars:
     verb: "{{ 'Create' if playbook_action == 'present' else 'Delete' if playbook_action == 'absent' else 'Query' }}"
