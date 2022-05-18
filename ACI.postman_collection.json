@@ -9,252 +9,607 @@
 			"name": "Get info",
 			"item": [
 				{
-					"name": "get all tenants",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "https://{{apic}}/api/class/fvTenant.json",
-							"protocol": "https",
-							"host": [
-								"{{apic}}"
-							],
-							"path": [
-								"api",
-								"class",
-								"fvTenant.json"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get tenant - CORE",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "https://{{apic}}/api/node/mo/uni/tn-CORE.json",
-							"protocol": "https",
-							"host": [
-								"{{apic}}"
-							],
-							"path": [
-								"api",
-								"node",
-								"mo",
-								"uni",
-								"tn-CORE.json"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get OOB mgmt IPs",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "https://{{apic}}/api/class/mgmtRsOoBStNode.json?query-target-filter=eq(mgmtRsOoBStNode.tDn,\"topology/pod-1/node-601\")",
-							"protocol": "https",
-							"host": [
-								"{{apic}}"
-							],
-							"path": [
-								"api",
-								"class",
-								"mgmtRsOoBStNode.json"
-							],
-							"query": [
-								{
-									"key": "query-target-filter",
-									"value": "eq(mgmtRsOoBStNode.tDn,\"topology/pod-1/node-601\")"
+					"name": "tenant stuff",
+					"item": [
+						{
+							"name": "get all tenants",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://{{apic}}/api/class/fvTenant.json",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"class",
+										"fvTenant.json"
+									]
 								}
-							]
+							},
+							"response": []
+						},
+						{
+							"name": "get tenant - CORE",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://{{apic}}/api/node/mo/uni/tn-CORE.json",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										"uni",
+										"tn-CORE.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get BDs in tenant",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://{{apic}}/api/node/mo/uni/tn-CORE.json?query-target=children&target-subtree-class=fvBD",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										"uni",
+										"tn-CORE.json"
+									],
+									"query": [
+										{
+											"key": "query-target",
+											"value": "children"
+										},
+										{
+											"key": "target-subtree-class",
+											"value": "fvBD"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "show all spaths",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://{{apic}}/api/class/fvRsPathAtt.json?query-target=self&query-target-filter=wcard(fvRsPathAtt.mode, \"untagged\")",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"class",
+										"fvRsPathAtt.json"
+									],
+									"query": [
+										{
+											"key": "query-target",
+											"value": "self"
+										},
+										{
+											"key": "target-subtree-class",
+											"value": "fvnsEncapBlk",
+											"disabled": true
+										},
+										{
+											"key": "order-by",
+											"value": "fvnsEncapBlk.from",
+											"disabled": true
+										},
+										{
+											"key": "query-target-filter",
+											"value": "wcard(fvRsPathAtt.mode, \"untagged\")"
+										},
+										{
+											"key": "query-target-filter",
+											"value": "or(wcard(fvnsEncapBlk.from, \"vlan-16\"),wcard(fvnsEncapBlk.from, \"vlan-17\"))",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get all EPGs in AP",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://{{apic}}/api/node/mo/uni/tn-CORE-CUST/ap-core-cust_sdwan.json?query-target=subtree&target-subtree-class=fvAEPg&order-by=fvAEPg.name",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										"uni",
+										"tn-CORE-CUST",
+										"ap-core-cust_sdwan.json"
+									],
+									"query": [
+										{
+											"key": "query-target",
+											"value": "subtree"
+										},
+										{
+											"key": "target-subtree-class",
+											"value": "fvAEPg"
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsBd",
+											"disabled": true
+										},
+										{
+											"key": "order-by",
+											"value": "fvAEPg.name"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get all EPGs with physical domains",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://{{apic}}/api/class/fvAEPg.json?query-target=subtree&target-subtree-class=fvRsDomAtt&rsp-subtree-class=fvRsDomAtt",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"class",
+										"fvAEPg.json"
+									],
+									"query": [
+										{
+											"key": "query-target",
+											"value": "subtree"
+										},
+										{
+											"key": "target-subtree-class",
+											"value": "fvRsDomAtt"
+										},
+										{
+											"key": "rsp-subtree-class",
+											"value": "fvRsDomAtt"
+										},
+										{
+											"key": "order-by",
+											"value": "fvAEPg.name",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				},
 				{
-					"name": "get all 10G ports",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "https://{{apic}}/api/class/l1PhysIf.json?query-target-filter=eq(l1PhysIf.speed,\"10G\")",
-							"protocol": "https",
-							"host": [
-								"{{apic}}"
-							],
-							"path": [
-								"api",
-								"class",
-								"l1PhysIf.json"
-							],
-							"query": [
-								{
-									"key": "query-target-filter",
-									"value": "eq(l1PhysIf.speed,\"10G\")"
+					"name": "fabric stuff",
+					"item": [
+						{
+							"name": "get OOB mgmt IPs",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://{{apic}}/api/class/mgmtRsOoBStNode.json?query-target-filter=eq(mgmtRsOoBStNode.tDn,\"topology/pod-1/node-601\")",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"class",
+										"mgmtRsOoBStNode.json"
+									],
+									"query": [
+										{
+											"key": "query-target-filter",
+											"value": "eq(mgmtRsOoBStNode.tDn,\"topology/pod-1/node-601\")"
+										}
+									]
 								}
-							]
+							},
+							"response": []
+						},
+						{
+							"name": "get all 10G ports",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://{{apic}}/api/class/l1PhysIf.json?query-target-filter=eq(l1PhysIf.speed,\"10G\")",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"class",
+										"l1PhysIf.json"
+									],
+									"query": [
+										{
+											"key": "query-target-filter",
+											"value": "eq(l1PhysIf.speed,\"10G\")"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get leaf interface profiles",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://{{apic}}/api/class/infraAccPortP.json",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"class",
+										"infraAccPortP.json"
+									],
+									"query": [
+										{
+											"key": "query-target-filter",
+											"value": "eq(mgmtRsOoBStNode.tDn,\"topology/pod-1/node-601\")",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "show vlan pool and filter by starting VLAN",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://{{apic}}/api/node/mo/uni/infra/vlanns-[pool_core_static]-static.json?query-target=self",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										"uni",
+										"infra",
+										"vlanns-[pool_core_static]-static.json"
+									],
+									"query": [
+										{
+											"key": "query-target",
+											"value": "self"
+										},
+										{
+											"key": "target-subtree-class",
+											"value": "fvnsEncapBlk",
+											"disabled": true
+										},
+										{
+											"key": "order-by",
+											"value": "fvnsEncapBlk.from",
+											"disabled": true
+										},
+										{
+											"key": "query-target-filter",
+											"value": "wcard(fvnsEncapBlk.from, \"vlan-16\")",
+											"disabled": true
+										},
+										{
+											"key": "query-target-filter",
+											"value": "or(wcard(fvnsEncapBlk.from, \"vlan-16\"),wcard(fvnsEncapBlk.from, \"vlan-17\"))",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "show all VLAN pools",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://{{apic}}/api/class/fvnsVlanInstP.json?query-target=children&target-subtree-class=fvnsEncapBlk&query-target-filter=wcard(fvnsEncapBlk.dn, \"pool_core_static\")",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"class",
+										"fvnsVlanInstP.json"
+									],
+									"query": [
+										{
+											"key": "query-target",
+											"value": "children"
+										},
+										{
+											"key": "target-subtree-class",
+											"value": "fvnsEncapBlk"
+										},
+										{
+											"key": "order-by",
+											"value": "fvnsEncapBlk.from",
+											"disabled": true
+										},
+										{
+											"key": "query-target-filter",
+											"value": "wcard(fvnsEncapBlk.dn, \"pool_core_static\")"
+										},
+										{
+											"key": "query-target-filter",
+											"value": "or(wcard(fvnsEncapBlk.from, \"vlan-16\"),wcard(fvnsEncapBlk.from, \"vlan-17\"))",
+											"disabled": true
+										},
+										{
+											"key": "query-target-filter",
+											"value": "and(ne(fvnsVlanInstP.dn,\"uni/infra/vlanns-[pool_core_static]-static\"),wcard(fvnsEncapBlk.dn, \"core\"))",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get port blocks and filter by node ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://{{apic}}/api/class/infraHPortS.json?query-target=subtree&query-target-filter=wcard(infraPortBlk.dn, \"vfsesr-ucs-rxx\")",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"class",
+										"infraHPortS.json"
+									],
+									"query": [
+										{
+											"key": "query-target",
+											"value": "subtree"
+										},
+										{
+											"key": "target-subtree-class",
+											"value": "infraPortBlk",
+											"disabled": true
+										},
+										{
+											"key": "query-target-filter",
+											"value": "wcard(infraPortBlk.dn, \"vfsesr-ucs-rxx\")"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get port blocks and their IPG",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://{{apic}}/api/class/infraHPortS.json?query-target=subtree&target-subtree-class=infraPortBlk,infraRsAccBaseGrp",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"class",
+										"infraHPortS.json"
+									],
+									"query": [
+										{
+											"key": "query-target",
+											"value": "subtree"
+										},
+										{
+											"key": "target-subtree-class",
+											"value": "infraPortBlk,infraRsAccBaseGrp"
+										},
+										{
+											"key": "query-target-filter",
+											"value": "wcard(infraRsAccBaseGrp.dn, \"fex-103\")",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get physical domains and their AEPs",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://{{apic}}/api/class/physDomP.json?query-target=children&target-subtree-class=infraRtDomP&query-target-filter=wcard(infraRtDomP.dn, \"dom_phy\")",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"class",
+										"physDomP.json"
+									],
+									"query": [
+										{
+											"key": "query-target",
+											"value": "children"
+										},
+										{
+											"key": "target-subtree-class",
+											"value": "infraRtDomP"
+										},
+										{
+											"key": "query-target-filter",
+											"value": "wcard(infraRtDomP.dn, \"dom_phy\")"
+										}
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				},
 				{
-					"name": "get BDs in tenant",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "https://{{apic}}/api/node/mo/uni/tn-CORE.json?query-target=children&target-subtree-class=fvBD",
-							"protocol": "https",
-							"host": [
-								"{{apic}}"
-							],
-							"path": [
-								"api",
-								"node",
-								"mo",
-								"uni",
-								"tn-CORE.json"
-							],
-							"query": [
-								{
-									"key": "query-target",
-									"value": "children"
-								},
-								{
-									"key": "target-subtree-class",
-									"value": "fvBD"
+					"name": "health and faults",
+					"item": [
+						{
+							"name": "get EPG faults",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://{{apic}}/api/class/fvAEPg.json?rsp-subtree-include=faults,subtree,no-scoped",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"class",
+										"fvAEPg.json"
+									],
+									"query": [
+										{
+											"key": "query-target",
+											"value": "children",
+											"disabled": true
+										},
+										{
+											"key": "target-subtree-class",
+											"value": "healthNodeInst",
+											"disabled": true
+										},
+										{
+											"key": "rsp-subtree-include",
+											"value": "faults,subtree,no-scoped"
+										}
+									]
 								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "show vlan pool and filter by starting VLAN",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "https://{{apic}}/api/node/mo/uni/infra/vlanns-[pool_core_static]-static.json?query-target=subtree&target-subtree-class=fvnsEncapBlk&order-by=fvnsEncapBlk.from&query-target-filter=or(wcard(fvnsEncapBlk.from, \"vlan-16\"),wcard(fvnsEncapBlk.from, \"vlan-17\"))",
-							"protocol": "https",
-							"host": [
-								"{{apic}}"
-							],
-							"path": [
-								"api",
-								"node",
-								"mo",
-								"uni",
-								"infra",
-								"vlanns-[pool_core_static]-static.json"
-							],
-							"query": [
-								{
-									"key": "query-target",
-									"value": "subtree"
-								},
-								{
-									"key": "target-subtree-class",
-									"value": "fvnsEncapBlk"
-								},
-								{
-									"key": "order-by",
-									"value": "fvnsEncapBlk.from"
-								},
-								{
-									"key": "query-target-filter",
-									"value": "wcard(fvnsEncapBlk.from, \"vlan-16\")",
-									"disabled": true
-								},
-								{
-									"key": "query-target-filter",
-									"value": "or(wcard(fvnsEncapBlk.from, \"vlan-16\"),wcard(fvnsEncapBlk.from, \"vlan-17\"))"
+							},
+							"response": []
+						},
+						{
+							"name": "get node faults",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://{{apic}}/api/class/fabricNode.json?rsp-subtree-include=faults,subtree,no-scoped&query-target-filter=wcard(faultInst.severity,critical)",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"class",
+										"fabricNode.json"
+									],
+									"query": [
+										{
+											"key": "target-subtree-class",
+											"value": "healthNodeInst",
+											"disabled": true
+										},
+										{
+											"key": "rsp-subtree-include",
+											"value": "faults,subtree,no-scoped"
+										},
+										{
+											"key": "query-target-filter",
+											"value": "wcard(faultInst.severity,critical)"
+										}
+									]
 								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "get all EPGs in AP",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "https://{{apic}}/api/node/mo/uni/tn-CORE-CUST/ap-core-cust_sdwan.json?query-target=subtree&target-subtree-class=fvAEPg&order-by=fvAEPg.name",
-							"protocol": "https",
-							"host": [
-								"{{apic}}"
-							],
-							"path": [
-								"api",
-								"node",
-								"mo",
-								"uni",
-								"tn-CORE-CUST",
-								"ap-core-cust_sdwan.json"
-							],
-							"query": [
-								{
-									"key": "query-target",
-									"value": "subtree"
-								},
-								{
-									"key": "target-subtree-class",
-									"value": "fvAEPg"
-								},
-								{
-									"key": "rsp-subtree-class",
-									"value": "fvRsBd",
-									"disabled": true
-								},
-								{
-									"key": "order-by",
-									"value": "fvAEPg.name"
+							},
+							"response": []
+						},
+						{
+							"name": "get EPG health",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "https://{{apic}}/api/class/fvAEPg.json?rsp-subtree-include=health",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"class",
+										"fvAEPg.json"
+									],
+									"query": [
+										{
+											"key": "query-target",
+											"value": "children",
+											"disabled": true
+										},
+										{
+											"key": "target-subtree-class",
+											"value": "healthNodeInst",
+											"disabled": true
+										},
+										{
+											"key": "rsp-subtree-include",
+											"value": "health"
+										}
+									]
 								}
-							]
+							},
+							"response": []
 						}
-					},
-					"response": []
-				},
-				{
-					"name": "Get port blocks and filter by node ID",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "https://{{apic}}/api/class/infraHPortS.json?query-target=subtree&target-subtree-class=infraPortBlk&query-target-filter=wcard(infraPortBlk.dn, \"fex-104\")",
-							"protocol": "https",
-							"host": [
-								"{{apic}}"
-							],
-							"path": [
-								"api",
-								"class",
-								"infraHPortS.json"
-							],
-							"query": [
-								{
-									"key": "query-target",
-									"value": "subtree"
-								},
-								{
-									"key": "target-subtree-class",
-									"value": "infraPortBlk"
-								},
-								{
-									"key": "query-target-filter",
-									"value": "wcard(infraPortBlk.dn, \"fex-104\")"
-								}
-							]
-						}
-					},
-					"response": []
+					]
 				}
 			]
 		},
@@ -262,127 +617,199 @@
 			"name": "Create objects",
 			"item": [
 				{
-					"name": "create BD",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"fvBD\":\r\n    {\r\n        \"attributes\":\r\n        {\r\n            \"dn\": \"uni/tn-{{tenant}}/BD-{{bd_name}}\",\r\n            \"mac\": \"{{mac_addr}}\",\r\n            \"arpFlood\": \"true\",\r\n            \"name\": \"{{bd_name}}\",\r\n            \"descr\": \"{{descr}}\",\r\n            \"unkMacUcastAct\": \"flood\",\r\n            \"unicastRoute\": \"false\",\r\n            \"rn\": \"BD-{{bd_name}}\",\r\n            \"status\": \"created\"\r\n        },\r\n        \"children\":\r\n        [\r\n            {\r\n                \"fvRsCtx\":\r\n                {\r\n                    \"attributes\":\r\n                    {\r\n                        \"tnFvCtxName\": \"{{vrf}}\",\r\n                        \"status\": \"created,modified\"\r\n                    },\r\n                    \"children\":\r\n                    []\r\n                }\r\n            }\r\n        ]\r\n    }\r\n}\r\n"
+					"name": "tenant stuff",
+					"item": [
+						{
+							"name": "create BD",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"fvBD\":\r\n    {\r\n        \"attributes\":\r\n        {\r\n            \"dn\": \"uni/tn-{{tenant}}/BD-{{bd_name}}\",\r\n            \"mac\": \"{{mac_addr}}\",\r\n            \"arpFlood\": \"true\",\r\n            \"name\": \"{{bd_name}}\",\r\n            \"descr\": \"{{descr}}\",\r\n            \"unkMacUcastAct\": \"flood\",\r\n            \"unicastRoute\": \"false\",\r\n            \"rn\": \"BD-{{bd_name}}\",\r\n            \"status\": \"created\"\r\n        },\r\n        \"children\":\r\n        [\r\n            {\r\n                \"fvRsCtx\":\r\n                {\r\n                    \"attributes\":\r\n                    {\r\n                        \"tnFvCtxName\": \"{{vrf}}\",\r\n                        \"status\": \"created,modified\"\r\n                    },\r\n                    \"children\":\r\n                    []\r\n                }\r\n            }\r\n        ]\r\n    }\r\n}\r\n"
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/mo/uni/tn-{{tenant}}/BD-{{bd_name}}.json",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										"uni",
+										"tn-{{tenant}}",
+										"BD-{{bd_name}}.json"
+									]
+								},
+								"description": "post to Uni"
+							},
+							"response": []
 						},
-						"url": {
-							"raw": "https://{{apic}}/api/node/mo/uni/tn-{{tenant}}/BD-{{bd_name}}.json",
-							"protocol": "https",
-							"host": [
-								"{{apic}}"
-							],
-							"path": [
-								"api",
-								"node",
-								"mo",
-								"uni",
-								"tn-{{tenant}}",
-								"BD-{{bd_name}}.json"
-							]
+						{
+							"name": "create EPG",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"fvAEPg\":\r\n    {\r\n        \"attributes\":\r\n        {\r\n            \"dn\": \"uni/tn-{{tenant}}/ap-{{ap_name}}/epg-{{epg_name}}\",\r\n            \"name\": \"{{epg_name}}\",\r\n            \"descr\": \"{{descr}}\",\r\n            \"rn\": \"epg-{{epg_name}}\",\r\n            \"status\": \"created\"\r\n        },\r\n        \"children\":\r\n        [\r\n            {\r\n                \"fvRsBd\":\r\n                {\r\n                    \"attributes\":\r\n                    {\r\n                        \"tnFvBDName\": \"{{bd_name}}\",\r\n                        \"status\": \"created,modified\"\r\n                    },\r\n                    \"children\":\r\n                    []\r\n                }\r\n            }\r\n        ]\r\n    }\r\n}"
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/mo/uni/tn-{{tenant}}/ap-{{ap_name}}/epg-{{epg_name}}.json",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										"uni",
+										"tn-{{tenant}}",
+										"ap-{{ap_name}}",
+										"epg-{{epg_name}}.json"
+									]
+								}
+							},
+							"response": []
 						},
-						"description": "post to Uni"
-					},
-					"response": []
+						{
+							"name": "add EPG to physical domain",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"fvRsDomAtt\": {\r\n    \"attributes\": {\r\n      \"resImedcy\": \"immediate\",\r\n      \"tDn\": \"uni/phys-{{{phys_dom_name}}}\",\r\n      \"status\": \"created\"\r\n    },\r\n    \"children\": []\r\n  }\r\n}"
+								},
+								"url": {
+									"raw": "https://avcosr-apic-p01.cocci.com/api/node/mo/uni/tn-{{tenant}}/ap-{{ap_name}}/epg-{{epg_name}}.json",
+									"protocol": "https",
+									"host": [
+										"avcosr-apic-p01",
+										"cocci",
+										"com"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										"uni",
+										"tn-{{tenant}}",
+										"ap-{{ap_name}}",
+										"epg-{{epg_name}}.json"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create static path binding",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"fvRsPathAtt\":\n    {\n        \"attributes\":\n        {\n            \"dn\": \"uni/tn-{{tenant}}/ap-{{ap_name}}/epg-{{epg_name}}/rspathAtt-[topology/pod-1/paths-{{node}}/pathep-[{{interface}}]]\",\n            \"encap\": \"vlan-{{vlan}}\",\n            \"tDn\": \"topology/pod-1/paths-{{node}}/pathep-[{{interface}}]\",\n            \"rn\": \"rspathAtt-[topology/pod-1/paths-{{node}}/pathep-[{{interface}}]]\",\n            \"status\": \"created\"\n        },\n        \"children\":\n        []\n    }\n}\n"
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/mo/uni/tn-{{tenant}}/ap-{{ap_name}}/epg-{{epg_name}}/rspathAtt-[topology/pod-1/paths-{{node}}/pathep-[{{interface}}]].json",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										"uni",
+										"tn-{{tenant}}",
+										"ap-{{ap_name}}",
+										"epg-{{epg_name}}",
+										"rspathAtt-[topology",
+										"pod-1",
+										"paths-{{node}}",
+										"pathep-[{{interface}}]].json"
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				},
 				{
-					"name": "create EPG",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"fvAEPg\":\r\n    {\r\n        \"attributes\":\r\n        {\r\n            \"dn\": \"uni/tn-{{tenant}}/ap-{{ap_name}}/epg-{{epg_name}}\",\r\n            \"name\": \"{{epg_name}}\",\r\n            \"descr\": \"{{descr}}\",\r\n            \"rn\": \"epg-{{epg_name}}\",\r\n            \"status\": \"created\"\r\n        },\r\n        \"children\":\r\n        [\r\n            {\r\n                \"fvRsBd\":\r\n                {\r\n                    \"attributes\":\r\n                    {\r\n                        \"tnFvBDName\": \"{{bd_name}}\",\r\n                        \"status\": \"created,modified\"\r\n                    },\r\n                    \"children\":\r\n                    []\r\n                }\r\n            }\r\n        ]\r\n    }\r\n}"
+					"name": "fabric stuff",
+					"item": [
+						{
+							"name": "Create VPC interface policy group",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"infraAccBndlGrp\": {\r\n    \"attributes\": {\r\n      \"dn\": \"uni/infra/funcprof/accbundle-{{ipg_name}}\",\r\n      \"lagT\": \"node\",\r\n      \"name\": \"{{ipg_name}}\",\r\n      \"descr\": \"ipg_descr\",\r\n      \"rn\": \"accbundle-{{ipg_name}}\",\r\n      \"status\": \"created\"\r\n    },\r\n    \"children\": [\r\n      {\r\n        \"infraRsAttEntP\": {\r\n          \"attributes\": {\r\n            \"tDn\": \"uni/infra/attentp-{{aep_name}}\",\r\n            \"status\": \"created,modified\"\r\n          },\r\n          \"children\": []\r\n        }\r\n      },\r\n      {\r\n        \"infraRsLacpPol\": {\r\n          \"attributes\": {\r\n            \"tnLacpLagPolName\": \"{{pol_lacp}}\",\r\n            \"status\": \"created,modified\"\r\n          },\r\n          \"children\": []\r\n        }\r\n      },\r\n      {\r\n        \"infraRsCdpIfPol\": {\r\n          \"attributes\": {\r\n            \"tnCdpIfPolName\": \"{{pol_cdp}}\",\r\n            \"status\": \"created,modified\"\r\n          },\r\n          \"children\": []\r\n        }\r\n      },\r\n      {\r\n        \"infraRsLldpIfPol\": {\r\n          \"attributes\": {\r\n            \"tnLldpIfPolName\": \"{{pol_lldp}}\",\r\n            \"status\": \"created,modified\"\r\n          },\r\n          \"children\": []\r\n        }\r\n      },\r\n      {\r\n        \"infraRsStpIfPol\": {\r\n          \"attributes\": {\r\n            \"tnStpIfPolName\": \"{{pol_stp}}\",\r\n            \"status\": \"created,modified\"\r\n          },\r\n          \"children\": []\r\n        }\r\n      }\r\n    ]\r\n  }\r\n}"
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/mo/uni/infra/funcprof/accbundle-{{ipg_name}}.json",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										"uni",
+										"infra",
+										"funcprof",
+										"accbundle-{{ipg_name}}.json"
+									]
+								}
+							},
+							"response": []
 						},
-						"url": {
-							"raw": "https://{{apic}}/api/node/mo/uni/tn-{{tenant}}/ap-{{ap_name}}/epg-{{epg_name}}.json",
-							"protocol": "https",
-							"host": [
-								"{{apic}}"
-							],
-							"path": [
-								"api",
-								"node",
-								"mo",
-								"uni",
-								"tn-{{tenant}}",
-								"ap-{{ap_name}}",
-								"epg-{{epg_name}}.json"
-							]
+						{
+							"name": "Create or delete VLAN encapsulation block",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"fvnsEncapBlk\": {\r\n        \"attributes\": {\r\n            \"dn\": \"uni/infra/vlanns-[{{vlan_pool}}]-static/from-[vlan-{{vlan_start}}]-to-[vlan-{{vlan_end}}]\",\r\n            \"from\": \"vlan-{{vlan_start}}\",\r\n            \"to\": \"vlan-{{vlan_end}}\",\r\n            \"descr\": \"db\",\r\n            \"rn\": \"from-[vlan-{{vlan_start}}]-to-[vlan-{{vlan_end}}]\",\r\n            \"status\": \"{{action}}\"\r\n        },\r\n        \"children\": []\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/mo/uni/infra/vlanns-[{{vlan_pool}}]-static/from-[vlan-{{vlan_start}}]-to-[vlan-{{vlan_end}}].json",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										"uni",
+										"infra",
+										"vlanns-[{{vlan_pool}}]-static",
+										"from-[vlan-{{vlan_start}}]-to-[vlan-{{vlan_end}}].json"
+									]
+								},
+								"description": "status field ({{action}} var) can be \"created\" or \"deleted\""
+							},
+							"response": []
 						}
-					},
-					"response": []
-				},
-				{
-					"name": "add EPG to physical domain",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n  \"fvRsDomAtt\": {\r\n    \"attributes\": {\r\n      \"resImedcy\": \"immediate\",\r\n      \"tDn\": \"uni/phys-{{{phys_dom_name}}}\",\r\n      \"status\": \"created\"\r\n    },\r\n    \"children\": []\r\n  }\r\n}"
-						},
-						"url": {
-							"raw": "https://avcosr-apic-p01.cocci.com/api/node/mo/uni/tn-{{tenant}}/ap-{{ap_name}}/epg-{{epg_name}}.json",
-							"protocol": "https",
-							"host": [
-								"avcosr-apic-p01",
-								"cocci",
-								"com"
-							],
-							"path": [
-								"api",
-								"node",
-								"mo",
-								"uni",
-								"tn-{{tenant}}",
-								"ap-{{ap_name}}",
-								"epg-{{epg_name}}.json"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "create static path binding",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"fvRsPathAtt\":\n    {\n        \"attributes\":\n        {\n            \"dn\": \"uni/tn-{{tenant}}/ap-{{ap_name}}/epg-{{epg_name}}/rspathAtt-[topology/pod-1/paths-{{node}}/pathep-[{{interface}}]]\",\n            \"encap\": \"vlan-{{vlan}}\",\n            \"tDn\": \"topology/pod-1/paths-{{node}}/pathep-[{{interface}}]\",\n            \"rn\": \"rspathAtt-[topology/pod-1/paths-{{node}}/pathep-[{{interface}}]]\",\n            \"status\": \"created\"\n        },\n        \"children\":\n        []\n    }\n}\n"
-						},
-						"url": {
-							"raw": "https://{{apic}}/api/node/mo/uni/tn-{{tenant}}/ap-{{ap_name}}/epg-{{epg_name}}/rspathAtt-[topology/pod-1/paths-{{node}}/pathep-[{{interface}}]].json",
-							"protocol": "https",
-							"host": [
-								"{{apic}}"
-							],
-							"path": [
-								"api",
-								"node",
-								"mo",
-								"uni",
-								"tn-{{tenant}}",
-								"ap-{{ap_name}}",
-								"epg-{{epg_name}}",
-								"rspathAtt-[topology",
-								"pod-1",
-								"paths-{{node}}",
-								"pathep-[{{interface}}]].json"
-							]
-						}
-					},
-					"response": []
+					]
 				}
 			]
 		},
@@ -390,74 +817,84 @@
 			"name": "Delete objects",
 			"item": [
 				{
-					"name": "delete static path binding",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"fvRsPathAtt\": {\n        \"attributes\": {\n            \"dn\": \"uni/tn-{{tenant}}/ap-{{ap_name}}/epg-{{epg_name}}/rspathAtt-[topology/pod-1/{{nodes}}/pathep-[{{interface}}]]\",\n            \"status\": \"deleted\"\n        },\n        \"children\": []\n    }\n}\ntn-CORE-IAAS/ap-core-iaas_network/epg-core-iaas_2252/rspathAtt-[topology/pod-1/protpaths-666-667/pathep-[vfsesr-ucs-r02-B_core]]"
-						},
-						"url": {
-							"raw": "https://{{apic}}/api/node/mo/uni/tn-{{tenant}}/ap-{{ap_name}}/epg-{{epg_name}}/rspathAtt-[topology/pod-1/{{nodes}}/pathep-[{{interface}}]].json",
-							"protocol": "https",
-							"host": [
-								"{{apic}}"
-							],
-							"path": [
-								"api",
-								"node",
-								"mo",
-								"uni",
-								"tn-{{tenant}}",
-								"ap-{{ap_name}}",
-								"epg-{{epg_name}}",
-								"rspathAtt-[topology",
-								"pod-1",
-								"{{nodes}}",
-								"pathep-[{{interface}}]].json"
-							]
+					"name": "tenant stuff",
+					"item": [
+						{
+							"name": "delete static path binding",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"fvRsPathAtt\": {\n        \"attributes\": {\n            \"dn\": \"uni/tn-{{tenant}}/ap-{{ap_name}}/epg-{{epg_name}}/rspathAtt-[topology/pod-1/{{nodes}}/pathep-[{{interface}}]]\",\n            \"status\": \"deleted\"\n        },\n        \"children\": []\n    }\n}\ntn-CORE-IAAS/ap-core-iaas_network/epg-core-iaas_2252/rspathAtt-[topology/pod-1/protpaths-666-667/pathep-[vfsesr-ucs-r02-B_core]]"
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/mo/uni/tn-{{tenant}}/ap-{{ap_name}}/epg-{{epg_name}}/rspathAtt-[topology/pod-1/{{nodes}}/pathep-[{{interface}}]].json",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										"uni",
+										"tn-{{tenant}}",
+										"ap-{{ap_name}}",
+										"epg-{{epg_name}}",
+										"rspathAtt-[topology",
+										"pod-1",
+										"{{nodes}}",
+										"pathep-[{{interface}}]].json"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Create access policies",
-			"item": [
+					]
+				},
 				{
-					"name": "Create VPC interface policy group",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n  \"infraAccBndlGrp\": {\r\n    \"attributes\": {\r\n      \"dn\": \"uni/infra/funcprof/accbundle-{{ipg_name}}\",\r\n      \"lagT\": \"node\",\r\n      \"name\": \"{{ipg_name}}\",\r\n      \"descr\": \"ipg_descr\",\r\n      \"rn\": \"accbundle-{{ipg_name}}\",\r\n      \"status\": \"created\"\r\n    },\r\n    \"children\": [\r\n      {\r\n        \"infraRsAttEntP\": {\r\n          \"attributes\": {\r\n            \"tDn\": \"uni/infra/attentp-{{aep_name}}\",\r\n            \"status\": \"created,modified\"\r\n          },\r\n          \"children\": []\r\n        }\r\n      },\r\n      {\r\n        \"infraRsLacpPol\": {\r\n          \"attributes\": {\r\n            \"tnLacpLagPolName\": \"{{pol_lacp}}\",\r\n            \"status\": \"created,modified\"\r\n          },\r\n          \"children\": []\r\n        }\r\n      },\r\n      {\r\n        \"infraRsCdpIfPol\": {\r\n          \"attributes\": {\r\n            \"tnCdpIfPolName\": \"{{pol_cdp}}\",\r\n            \"status\": \"created,modified\"\r\n          },\r\n          \"children\": []\r\n        }\r\n      },\r\n      {\r\n        \"infraRsLldpIfPol\": {\r\n          \"attributes\": {\r\n            \"tnLldpIfPolName\": \"{{pol_lldp}}\",\r\n            \"status\": \"created,modified\"\r\n          },\r\n          \"children\": []\r\n        }\r\n      },\r\n      {\r\n        \"infraRsStpIfPol\": {\r\n          \"attributes\": {\r\n            \"tnStpIfPolName\": \"{{pol_stp}}\",\r\n            \"status\": \"created,modified\"\r\n          },\r\n          \"children\": []\r\n        }\r\n      }\r\n    ]\r\n  }\r\n}"
-						},
-						"url": {
-							"raw": "https://{{apic}}/api/node/mo/uni/infra/funcprof/accbundle-{{ipg_name}}.json",
-							"protocol": "https",
-							"host": [
-								"{{apic}}"
-							],
-							"path": [
-								"api",
-								"node",
-								"mo",
-								"uni",
-								"infra",
-								"funcprof",
-								"accbundle-{{ipg_name}}.json"
-							]
+					"name": "fabric stuff",
+					"item": [
+						{
+							"name": "Delete VLAN encapsulation block",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"fvnsEncapBlk\": {\r\n        \"attributes\": {\r\n            \"dn\": \"uni/infra/vlanns-[{{vlan_pool}}]-static/from-[vlan-{{vlan_start}}]-to-[vlan-{{vlan_end}}]\",\r\n            \"status\": \"deleted\"\r\n        },\r\n        \"children\": []\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/mo/uni/infra/vlanns-[{{vlan_pool}}]-static/from-[vlan-{{vlan_start}}]-to-[vlan-{{vlan_end}}].json",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										"uni",
+										"infra",
+										"vlanns-[{{vlan_pool}}]-static",
+										"from-[vlan-{{vlan_start}}]-to-[vlan-{{vlan_end}}].json"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
 				}
 			]
 		},
@@ -465,37 +902,79 @@
 			"name": "Modify objects",
 			"item": [
 				{
-					"name": "Modify EPG description",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n  \"fvAEPg\": {\r\n    \"attributes\": {\r\n      \"dn\": \"uni/tn-{{tenant}}/ap-{{ap_name}}/epg-{{epg_name}}\",\r\n      \"descr\": \"{{description}}\"\r\n    },\r\n    \"children\": []\r\n  }\r\n}"
-						},
-						"url": {
-							"raw": "https://{{apic}}/api/node/mo/uni/tn-{{tenant}}/ap-{{ap_name}}/epg-{{epg_name}}.json",
-							"protocol": "https",
-							"host": [
-								"{{apic}}"
-							],
-							"path": [
-								"api",
-								"node",
-								"mo",
-								"uni",
-								"tn-{{tenant}}",
-								"ap-{{ap_name}}",
-								"epg-{{epg_name}}.json"
-							]
+					"name": "tenant stuff",
+					"item": [
+						{
+							"name": "Modify EPG description",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"fvAEPg\": {\r\n    \"attributes\": {\r\n      \"dn\": \"uni/tn-{{tenant}}/ap-{{ap_name}}/epg-{{epg_name}}\",\r\n      \"descr\": \"{{description}}\"\r\n    },\r\n    \"children\": []\r\n  }\r\n}"
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/mo/uni/tn-{{tenant}}/ap-{{ap_name}}/epg-{{epg_name}}.json",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										"uni",
+										"tn-{{tenant}}",
+										"ap-{{ap_name}}",
+										"epg-{{epg_name}}.json"
+									]
+								}
+							},
+							"response": []
 						}
-					},
-					"response": []
+					]
+				},
+				{
+					"name": "fabric stuff",
+					"item": [
+						{
+							"name": "change phys domain VLAN pool",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"infraRsVlanNs\": {\r\n        \"attributes\": {\r\n            \"tDn\": \"uni/infra/vlanns-[{{new_pool}}]-static\"\r\n        },\r\n        \"children\": []\r\n    }\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{apic}}/api/node/mo/uni/phys-{{domain}}/rsvlanNs.json",
+									"protocol": "https",
+									"host": [
+										"{{apic}}"
+									],
+									"path": [
+										"api",
+										"node",
+										"mo",
+										"uni",
+										"phys-{{domain}}",
+										"rsvlanNs.json"
+									]
+								}
+							},
+							"response": []
+						}
+					]
 				}
 			]
 		},
 		{
-			"name": "Login",
+			"name": "AAA Login",
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -517,6 +996,62 @@
 					"path": [
 						"api",
 						"aaaLogin.json"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AAA logout",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"aaaUser\": {\r\n        \"attributes\": {\r\n            \"name\": \"{{username}}\"\r\n        }\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{apic}}/api/aaaLogout.json",
+					"protocol": "https",
+					"host": [
+						"{{apic}}"
+					],
+					"path": [
+						"api",
+						"aaaLogout.json"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "AAA refresh",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{apic}}/api/aaaRefresh.json",
+					"protocol": "https",
+					"host": [
+						"{{apic}}"
+					],
+					"path": [
+						"api",
+						"aaaRefresh.json"
 					]
 				}
 			},
