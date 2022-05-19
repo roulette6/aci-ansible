@@ -1,0 +1,4 @@
+switch_profile_name,leaf_name,from_leaf,to_leaf,leaf_ifp,pol_grp
+leaf-101_swp,leaf-101,101,101,leaf-101_ifp,leaf-sw-pol-grp
+leaf-102_swp,leaf-102,102,102,leaf-102_ifp,leaf-sw-pol-grp
+leaf-101_leaf-102_swp,leaf-101_leaf-102,101,102,leaf-101_leaf-102_ifp,leaf-sw-pol-grp

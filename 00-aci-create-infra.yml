@@ -1,0 +1,171 @@
+---
+# This playbook will create the following:
+# a tenant, vrf, bd, ap, epg, spath, vlan pool, port selector with port block
+# requirements: leaf interface profile must exist and be bound to a leaf profile
+# ansible-playbook aci-create-infra.yml --extra-vars "apic=aci.vm.jm playbook_action=query"
+
+- name: "Create a bunch of stuff"
+  hosts: "{{ apic }}"
+  ignore_errors: yes
+
+  vars:
+    login_info: &login_info
+      host: "{{ inventory_hostname }}"
+      username: "{{ ansible_user }}"
+      password: "{{ ansible_password }}"
+      validate_certs: no
+    verb: "{{ 'Create' if playbook_action == 'present' else 'Delete' if playbook_action == 'absent' else 'Query' }}"
+    rest_action: "{{ 'created' if playbook_action == 'present' else 'deleted' if playbook_action == 'absent' else 'query' }}"
+    leaf_profile: "{{ leaf_swp }}"
+    leaf_ifp: "{{ leaf_ifp }}"
+    switch_port: "{{ switch_port }}"
+    vlan_id: 110
+    tenant: jm-tenant
+    vrf: jm-vrf
+    bd: jm-bd
+    ap: jm-ap
+    epg: jm-epg
+    epg_descr: "{{ jm-epg created by Ansible }}"
+    vlan_pool: jm-vlan-pool
+    block_start: 100
+    block_end: 199
+    domain: jm-domain
+    domain_type: phys
+
+  tasks:
+    - name: Assert that playbook action is query, present, or absent
+      assert:
+        that:
+          - "playbook_action == 'query' or playbook_action == 'present' or  playbook_action == 'absent'"
+        success_msg: "Playbook action is {{ playbook_action }}"
+        fail_msg: Action must be query, present, or absent
+        quiet: no
+      tags: assert
+
+# Create vlan pool and encaps block
+
+    # check if pool exists before creating/deleting
+    - import_role:
+        name: roles/get-dn
+      vars:
+        mo: "infra/vlanns-[{{ vlan_pool }}]-static"
+      register: vlan_pool_precheck
+      tags: vlan
+    
+    # only show variable if action is query and var is defined
+    - name: Show VLAN pool query results
+      debug:
+        var: vlan_pool_precheck
+      when: playbook_action == "query" and vlan_pool_precheck is defined
+
+    # create/delete pool if exists
+    - import_role:
+        name: roles/vlan-pool
+      register: vlan_pool_result
+      tags: vlan
+      when: playbook_action != "query" and vlan_pool_precheck is undefined
+
+    # create encaps block only if vlan pool exists
+    - import_role:
+        name: roles/vlan-encaps-block
+      register: vlan_encaps_blk_result
+      when: playbook_action != "query" and (vlan_pool_precheck is defined or vlan_pool_result is defined)
+      tags: vlan
+
+    - name: Show debug output for VLAN encapsulation
+      debug:
+        var: vlan_encaps_blk_result | json_query('current[].fvnsEncapBlk.attributes.dn')
+      when: playbook_action == "query" and vlan_encaps_blk_result is defined
+      tags: vlan
+
+# Create physical domain and assign VLAN pool
+
+    # check if physical domain exists
+    - import_role:
+        name: roles/get-dn
+      vars:
+        mo: "phys-{{ domain }}"
+      register: phys_domain_precheck
+    
+    # show precheck results if requested
+    - name: Show physical domain info
+      debug:
+        var: phys_domain_precheck | json_query('imdata[].physDomP.attributes.dn')
+      when: playbook_action == "query" and phys_domain_precheck is defined
+  
+    # create physical domain if not exist
+    - import_role:
+        name: roles/phys-dom
+      when: playbook_action != "query" and phys_domain_precheck is not defined
+
+# create leaf interface profile
+
+    - name: "{{ verb }} leaf interface profile"
+      aci_interface_policy_leaf_profile:
+        <<: *login_info
+
+        leaf_interface_profile: "{{ leaf_ifp }}"
+        description: Created by Ansible
+        state: "{{ playbook_action }}"
+
+      register: leaf_ifp_result
+      delegate_to: localhost
+      when: playbook_action != "query"
+      tags: leaf_ifp
+
+    - name: Show leaf ifp results
+      debug:
+        var: leaf_ifp_result | json_query('imdata[].infraAccPortP.attributes.[name,descr,dn]')
+      when: playbook_action != "query"
+      tags: leaf_ifp
+
+# attach leaf interface profile to leaf profile
+
+    - name: "Attach leaf ifp to leaf profile"
+      aci_rest:
+        <<: *login_info
+
+        path: "/api/node/mo/uni/infra/nprof-{{ leaf_swp }}.json"
+        method: post
+        content:
+          infraRsAccPortP:
+            attributes:
+              tDn: "uni/infra/accportprof-{{ leaf_ifp }}"
+              status: "{{ rest_action }}"
+      register: leaf_swp_result
+      when: playbook_action != "query"
+      tags: leaf_swp
+
+    - name: Show leaf ifp results
+      debug:
+        var: leaf_swp_result | json_query('imdata[].infraRsAccPortP.attributes.dn')
+      when: playbook_action != "query"
+      tags: leaf_swp
+
+# Create port block
+
+    - name: "{{ verb }} access port selector"
+      aci_access_port_to_interface_policy_leaf_profile:
+        <<: *login_info
+
+        leaf_interface_profile: "{{ leaf_ifp }}"
+        access_port_selector: "jm-server1-sel"
+        leaf_port_blk: "jm-server1-blk"
+        from_port: "{{ switch_port }}"
+        to_port: "{{ switch_port }}"
+        policy_group: Heroes_standard_access
+        state: "{{ playbook_action }}"
+      register: port_block_result
+      delegate_to: localhost
+      when: playbook_action != "query"
+      tags: port
+
+    - name: Show debug output for access port block
+      debug:
+        msg: "{{ port_block_result | json_query('[
+          current[].infraHPortS.attributes.dn,
+          current[].infraHPortS.children[].infraPortBlk.attributes.[name, fromPort, toPort],
+          current[].infraHPortS.children[].infraRsAccBaseGrp.attributes.tDn
+          ]') }}"
+      when: playbook_action != "query"
+      tags: port

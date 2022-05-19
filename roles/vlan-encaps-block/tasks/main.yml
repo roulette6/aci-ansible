@@ -1,0 +1,16 @@
+---
+# tasks file for roles/vlan-encaps-block
+- name: "{{ verb }} a VLAN pool encapsulation block"
+  aci_vlan_pool_encap_block:
+    host: "{{ inventory_hostname }}"
+    username: "{{ ansible_user }}"
+    password: "{{ ansible_password }}"
+    validate_certs: no
+
+    pool: "{{ vlan_pool }}"
+    pool_allocation_mode: static
+    block_name: "jm-encaps-block"
+    block_start: "{{ block_start }}"
+    block_end: "{{ block_end }}"
+    state: "{{ playbook_action }}"
+  delegate_to: localhost

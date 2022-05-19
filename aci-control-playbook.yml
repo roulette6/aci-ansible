@@ -1,0 +1,11 @@
+---
+# This playbook will create the following:
+# a tenant, vrf, bd, ap, epg, spath, vlan pool, port selector with port block
+# requirements: leaf interface profile must exist and be bound to a leaf profile
+# ansible-playbook aci-create-infra.yml --extra-vars "apic=apic_pvt leaf_profile=leaf_1 leaf_ifp=leaf_1_ifp switch_port=46 vlan_id=1607 playbook_action=query"
+
+- name: Create access policies
+  import_playbook: 00-aci-create-infra.yml
+
+- name: Create tenant objects
+  import_playbook: 01-aci-create-tenant.yml

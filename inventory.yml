@@ -15,3 +15,9 @@ all:
           ansible_host: 10.10.20.14
           ansible_user: admin
           ansible_password: C1sco12345
+        aci.vm.jm:
+          ansible_user: admin
+          ansible_password: C1sco12345
+          leaf_swp: leaf-101_swp
+          leaf_ifp: leaf-101_ifp
+          sw_port: 20

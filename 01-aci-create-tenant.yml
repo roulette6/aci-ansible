@@ -1,0 +1,185 @@
+---
+# This playbook will create the following:
+# a tenant, vrf, bd, ap, epg, spath, vlan pool, port selector with port block
+# requirements: leaf interface profile must exist and be bound to a leaf profile
+# ansible-playbook aci-create-tenant.yml --extra-vars "apic=aci.vm.jm playbook_action=query"
+
+- name: "Create a bunch of stuff"
+  hosts: "{{ apic }}"
+  vars:
+    login_info: &login_info
+      host: "{{ inventory_hostname }}"
+      username: "{{ ansible_user }}"
+      password: "{{ ansible_password }}"
+      validate_certs: no
+    verb: "{{ 'Create' if playbook_action == 'present' else 'Delete' if playbook_action == 'absent' else 'Query' }}"
+    rest_action: "{{ 'created' if playbook_action == 'present' else 'deleted' if playbook_action == 'absent' else 'query' }}"
+    leaf_profile: "{{ leaf_swp }}"
+    leaf_ifp: "{{ leaf_ifp }}"
+    switch_port: "{{ sw_port }}"
+    vlan_id: 110
+    tenant: jm-tenant
+    vrf: jm-vrf
+    bd: jm-bd
+    ap: jm-ap
+    epg: jm-epg
+    epg_descr: "{{ jm-epg created by Ansible }}"
+    vlan_pool: jm-vlan-pool
+    block_start: 100
+    block_end: 199
+    domain: jm-domain
+    domain_type: phys
+
+  tasks:
+    - name: Assert that playbook action is query, present, or absent
+      assert:
+        that:
+          - "playbook_action == 'query' or playbook_action == 'present' or  playbook_action == 'absent'"
+        success_msg: "Playbook action is {{ playbook_action }}"
+        fail_msg: Action must be query, present, or absent
+        quiet: no
+      tags: assert
+
+
+# Create tenant
+
+    - name: "{{ verb }} tenant"
+      aci_tenant:
+        <<: *login_info
+
+        tenant: "{{ tenant }}"
+        description: JM tenant created by Ansible
+        state: "{{ playbook_action }}"
+      delegate_to: localhost
+      register: tenant_result
+    
+    - name: Display tenant results
+      debug:
+        var: tenant_result | json_query('current[].fvTenant.attributes.dn')
+
+# Create VRF
+
+    - name: "{{ verb }} VRF"
+      aci_vrf:
+        <<: *login_info
+
+        vrf: "{{ vrf }}"
+        tenant: "{{ tenant }}"
+        state: "{{ playbook_action }}"
+      delegate_to: localhost
+      register: vrf_result
+
+    - name: Display tenant results
+      debug:
+        var: vrf_result | json_query('current[].fvCtx.attributes.dn')
+
+# create BD
+
+    - name: "{{ verb }} Bridge Domains"
+      aci_bd:
+        <<: *login_info
+
+        tenant: "{{ tenant }}"
+        vrf: "{{ vrf }}"
+        bd: "{{ bd }}"
+        description: "{{ bd }} Created by Ansible"
+        arp_flooding: yes
+        l2_unknown_unicast: flood
+        multi_dest: bd-flood
+        enable_multicast: no
+        ip_learning: yes
+        enable_routing: no
+        state: "{{ playbook_action }}"
+      register: bd_results
+      delegate_to: localhost
+
+    - name: Show BD results
+      debug:
+        msg:
+          - "{{ bd_results | json_query('current[0].fvBD.attributes.dn') }}"
+
+
+# Create AP
+
+    - name: "{{ verb }} Application profile"
+      aci_ap:
+        <<: *login_info
+
+        tenant: "{{ tenant }}"
+        ap: "{{ ap }}"
+        description: "{{ ap }} created by Ansible"
+        state: "{{ playbook_action }}"
+      delegate_to: localhost
+      register: ap_result
+    
+    - name: Show AP results
+      debug:
+        var: ap
+
+
+# create EPG and connect to domain
+
+    - name: "{{ verb }} EPG"
+      tags: epg
+      aci_epg:
+        <<: *login_info
+
+        tenant: "{{ tenant }}"
+        bd: "{{ bd }}"
+        ap: "{{ ap }}"
+        epg: "{{ epg }}"
+        description: "{{ epg }} created by Ansible"
+        state: "{{ playbook_action }}"
+      register: epg_result
+      delegate_to: localhost
+
+    - name: Show EPG results
+      tags: epg
+      debug:
+        msg: "{{ epg_result | json_query('current[0].fvAEPg.attributes.dn') }}"
+
+    - name: Connect EPG to Domain
+      tags: epg
+      aci_epg_to_domain:
+        <<: *login_info
+
+        tenant: "{{ tenant }}"
+        ap: "{{ ap }}"
+        epg: "{{ epg }}"
+        domain: "{{ domain }}"
+        domain_type: "{{ domain_type }}"
+        state: "{{ playbook_action }}"
+      register: phy_dom_result
+      delegate_to: localhost
+
+    - name: Show EPG to domain connection results
+      tags: epg
+      debug:
+        msg: "{{ phy_dom_result | json_query('current[].fvRsDomAtt.attributes.dn') }}"
+
+# Create static path bindings
+
+    - name: "{{ verb }} static path bindings"
+      aci_static_binding_to_epg:
+        <<: *login_info
+
+        tenant: "{{ tenant }}"
+        ap: "{{ ap }}"
+        epg: "{{ epg }}"
+
+        pod: 1
+        leafs: 101
+        interface: "1/{{ sw_port }}"
+
+        interface_type: switch_port
+        interface_mode: 802.1p
+        encap_id: "{{ vlan_id }}"
+        state: "{{ playbook_action }}"
+      register: spath_result
+      delegate_to: localhost
+      tags: spath
+
+    - name: Show static path results
+      debug:
+        var: spath_result | json_query('current[].fvRsPathAtt.attributes.[encap,dn]')
+      tags: spath
