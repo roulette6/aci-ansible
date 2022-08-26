@@ -1,0 +1,42 @@
+---
+
+- name: QUERY FABRIC AND BUILD FAULTS REPORT
+  hosts: aci
+
+  tasks:
+    - name: Get system faults summary
+      aci_rest:
+        host: "{{ ansible_host }}"
+        user: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+
+        path: "/api/node/class/faultSummary.json?order-by=faultSummary.severity|desc"
+        method: get
+      delegate_to: localhost
+      register: faults_system
+    
+    - name: Print system faults summary response data
+      debug:
+        var: faults_system
+        verbosity: 1
+    
+    - name: Get tenant faults
+      aci_rest:
+        host: "{{ ansible_host }}"
+        user: "{{ ansible_user }}"
+        password: "{{ ansible_password }}"
+
+        path: "/api/mo/uni/tn-{{ customer_name }}.json?rsp-subtree-include=faults,subtree,no-TODO"
+        method: get
+      delegate_to: localhost
+      register: faults_system
+    
+    - name: Print system faults summary response data
+      debug:
+        var: faults_system
+        verbosity: 1
+    
+    - name: Save faults markdown report
+      template:
+        src: "report_faults.j2"
+        dest: "reports/fragments/report-faults.md"

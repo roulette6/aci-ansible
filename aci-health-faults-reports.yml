@@ -1,0 +1,12 @@
+---
+
+- hosts: localhost
+  tasks:
+    - debug:
+      msg: including playsbooks
+
+- name: Include health report playbook
+  import_playbook: aci-report-health.yml
+
+- name: Include faults report playbook
+  import_playbook: aci-report-faults.yml

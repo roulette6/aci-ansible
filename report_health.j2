@@ -1,0 +1,22 @@
+## ACI health
+
+{% if health_system %}
+### System health
+
+Current system health: __{{ health_system.imdata.0.fabricHealthTotal.attributes.cur }}__ (max 100)
+{% endif %}
+
+{% if health_topology %}
+### Fabric health
+
+{% for node in health_topology.imdata %}
+#### Node {{ node.topSystem.attributes.name }}
+* Current node health: __{{ node.topSystem.children.0.healthInst.attributes.cur }}__
+* Node __{{ node.topSystem.attributes.id }}__ in __{{ node.topSystem.attributes.fabricDomain }}__ with role __{{ node.topSystem.attributes.role }}__ and serial number __{{ node.topSystem.attributes.serial }}__
+{% endfor %}
+{% endif %}
+
+{% if health_tenant %}
+### Tenant {{ health_tenant.imdata.0.fvTenant.attributes.name }} health
+* Current tenant health: __{{ health_tenant.imdata.0.fvTenant.children.0.healthInst.attributes. }}__
+{% endif %}
