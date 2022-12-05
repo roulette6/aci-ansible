@@ -1,5 +1,5 @@
 ---
-# This playbook is meant to be a simple bootstram of an ACI sandbox
+# This playbook is meant to be a simple bootstrap of an ACI sandbox
 # once the fabric has been discovered. The playbook expects a small
 # fabric with spine-201, leaf-201, and leaf-202. The playbook will
 # create the following:
@@ -13,7 +13,7 @@
 # One tenant, VRF, BD, AP, and EPG. Static path bindings to
 # all three interfaces.
 
-# ansible-playbook simple-sandbox-bootstrap.yml --extra-vars "apic=aci.vm.jm"
+# ansible-playbook sandbox-bootstrap-infra.yml --extra-vars "apic=aci.vm.jm"
 
 - name: "Create a bunch of stuff"
   hosts: "{{ apic }}"
