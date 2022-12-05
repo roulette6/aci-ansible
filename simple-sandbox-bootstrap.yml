@@ -1,0 +1,246 @@
+---
+# This playbook is meant to be a simple bootstram of an ACI sandbox
+# once the fabric has been discovered. The playbook expects a small
+# fabric with spine-201, leaf-201, and leaf-202. The playbook will
+# create the following:
+
+# FABRIC:
+# Three leaf switch profiles and leaf interface profiles, two
+# access port selectors, and one vPC port selector, with
+# corresponding IPG requirements.
+
+# TENANT:
+# One tenant, VRF, BD, AP, and EPG. Static path bindings to
+# all three interfaces.
+
+# ansible-playbook simple-sandbox-bootstrap.yml --extra-vars "apic=aci.vm.jm"
+
+- name: "Create a bunch of stuff"
+  hosts: "{{ apic }}"
+  ignore_errors: true
+
+  vars:
+    login_info: &login_info
+      host: "{{ inventory_hostname }}"
+      username: "{{ ansible_user }}"
+      password: "{{ ansible_password }}"
+      validate_certs: false
+    ipg:
+      access: single_apg
+      vpc: core-fw01_vpc
+    leaf_201:
+      name: leaf-201
+      swp:
+        leaf_sel: leaf-201_sel
+        node_block: one
+        from: "201"
+        to: "201"
+      ifp:
+        acc_port_sel: "eth1_2"
+        leaf_port_blk: block2
+        from_port: "2"
+        to_port: "2"
+    leaf_202:
+      name: leaf-202
+      swp:
+        leaf_sel: leaf-202_sel
+        node_block: two
+        from: "202"
+        to: "202"
+      ifp:
+        acc_port_sel: "eth1_2"
+        leaf_port_blk: block2
+        from_port: "2"
+        to_port: "2"
+      policy_group: single_apg
+    leaf_201_202:
+      name: leaf-201_202
+      swp:
+        leaf_sel: leaf-201_202_sel
+        node_block: three
+        from: 201
+        to: 202
+      ifp:
+        acc_port_sel: "eth1_1_core-fw01"
+        leaf_port_blk: block2
+        from_port: "1"
+        to_port: "1"
+    tenant: DiamondDogs
+    vrf: DD_vrf
+    bd: DD_bd
+    ap: DD_ap
+    epg: DD_epg
+    vlan_id: 666
+    epg_descr: "{{ DD_epg created by Ansible }}"
+    vlan_pool: DD_vlan-pool
+    block_start: 660
+    block_end: 669
+    domain: DD_domain
+    domain_type: phys
+
+  tasks:
+    - name: Roll back to blank slate config
+      aci_rest:
+        <<: *login_info
+
+        path: "/api/node/mo/uni/fabric/configimp-default.json"
+        method: post
+        content:
+          configImportP:
+            attributes:
+              dn: uni/fabric/configimp-default
+              name: default
+              snapshot: 'true'
+              adminSt: triggered
+              fileName: ce2_defaultOneTime-2022-12-03T12-09-33.tar.gz
+              importType: replace
+              importMode: atomic
+              rn: configimp-default
+              status: created,modified
+            children: []
+      delegate_to: localhost
+      tags: rollback
+
+    - name: Create VLAN pool
+      aci_vlan_pool:
+        <<: *login_info
+
+        pool: "{{ vlan_pool }}"
+        pool_allocation_mode: static
+        description: Diamond Dogs VLANs
+        state: present
+      delegate_to: localhost
+
+    - name: "Create VLAN pool encapsulation block"
+      aci_vlan_pool_encap_block:
+        <<: *login_info
+
+        pool: "{{ vlan_pool }}"
+        pool_allocation_mode: static
+        block_name: "DD-encaps-block"
+        block_start: "{{ block_start }}"
+        block_end: "{{ block_end }}"
+        state: present
+      delegate_to: localhost
+
+    - name: "Create DD physical domain"
+      aci_domain:
+        <<: *login_info
+
+        domain: "{{ domain }}"
+        domain_type: "{{ domain_type }}"
+        state: present
+      delegate_to: localhost
+
+    - name: "Bind phydom {{ domain }} to VLAN pool {{ vlan_pool }}"
+      aci_domain_to_vlan_pool:
+        <<: *login_info
+
+        domain: "{{ domain }}"
+        domain_type: "{{ domain_type }}"
+        pool: "{{ vlan_pool }}"
+        pool_allocation_mode: static
+        state: present
+      delegate_to: localhost
+
+    - name: "Create leaf interface profile (infraAccPortP)"
+      aci_interface_policy_leaf_profile:
+        <<: *login_info
+
+        leaf_interface_profile: "{{ item.name }}_ifp"
+        description: Created by Ansible
+        state: present
+      delegate_to: localhost
+      with_items:
+        - "{{ leaf_201 }}"
+        - "{{ leaf_202 }}"
+        - "{{ leaf_201_202 }}"
+      tags: leaf_ifp
+
+    - name: "Create leaf switch profiles (infraNodeP)"
+      aci_switch_policy_leaf_profile:
+        <<: *login_info
+
+        leaf_profile: "{{ item.name }}_swp"
+        description: Created by Ansible
+        state: present
+      delegate_to: localhost
+      tags: leaf_swp
+      register: infraNodeP
+      with_items:
+        - "{{ leaf_201 }}"
+        - "{{ leaf_202 }}"
+        - "{{ leaf_201_202 }}"
+
+    - name: "Add leaf selector (infraLeafS) to switch profiles (infraNodeP)"
+      aci_switch_leaf_selector:
+        <<: *login_info
+
+        leaf_profile: "{{ item.name }}_swp"
+        leaf: "{{ item.name }}_sel"
+        leaf_node_blk: "{{ item.swp.node_block }}"
+        from: "{{ item.swp.from }}"
+        to: "{{ item.swp.to }}"
+        state: present
+      delegate_to: localhost
+      register: infraLeafS
+      when: infraNodeP.changed
+      tags: leaf_swp
+      with_items:
+        - "{{ leaf_201 }}"
+        - "{{ leaf_202 }}"
+        - "{{ leaf_201_202 }}"
+
+    - name: Associate swp (infraNodeP) with ifp (infraAccPortP)
+      aci_interface_selector_to_switch_policy_leaf_profile:
+        <<: *login_info
+
+        leaf_profile: "{{ item.name }}_swp"
+        interface_selector: "{{ item.name }}_ifp"
+        state: present
+      delegate_to: localhost
+      when: infraLeafS.changed
+      tags: leaf_swp
+      with_items:
+        - "{{ leaf_201 }}"
+        - "{{ leaf_202 }}"
+        - "{{ leaf_201_202 }}"
+
+    - name: Create access port IPG
+      aci_interface_policy_leaf_policy_group:
+        <<: *login_info
+
+        lag_type: leaf
+        policy_group: "{{ ipg.access }}"
+        lldp_policy: system-lldp-enabled
+        state: present
+      delegate_to: localhost
+
+    - name: Create VPC IPG
+      aci_interface_policy_leaf_policy_group:
+        <<: *login_info
+
+        lag_type: node
+        policy_group: "{{ ipg.vpc }}"
+        port_channel_policy: system-lacp-active
+        lldp_policy: system-lldp-enabled
+        state: present
+      delegate_to: localhost
+
+    - name: "Create access port selector"
+      aci_access_port_to_interface_policy_leaf_profile:
+        <<: *login_info
+
+        leaf_interface_profile: "{{ item.name }}_ifp"
+        access_port_selector: "{{ item.ifp.acc_port_sel }}"
+        leaf_port_blk: "{{ item.ifp.leaf_port_blk }}"
+        from_port: "{{ switch_port }}"
+        to_port: "{{ switch_port }}"
+        policy_group: Heroes_standard_access
+        state: present
+      delegate_to: localhost
+      with_items:
+        - "{{ leaf_201 }}"
+        - "{{ leaf_202 }}"
+        - "{{ leaf_201_202 }}"
+      tags: port
