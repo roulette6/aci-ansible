@@ -36,6 +36,7 @@
         from: "201"
         to: "201"
       ifp:
+        ipg: single_apg
         acc_port_sel: "eth1_2"
         leaf_port_blk: block2
         from_port: "2"
@@ -48,6 +49,7 @@
         from: "202"
         to: "202"
       ifp:
+        ipg: single_apg
         acc_port_sel: "eth1_2"
         leaf_port_blk: block2
         from_port: "2"
@@ -61,6 +63,7 @@
         from: 201
         to: 202
       ifp:
+        ipg: core-fw01_vpc
         acc_port_sel: "eth1_1_core-fw01"
         leaf_port_blk: block2
         from_port: "1"
@@ -166,11 +169,15 @@
         state: present
       delegate_to: localhost
       tags: leaf_swp
-      register: infraNodeP
       with_items:
         - "{{ leaf_201 }}"
         - "{{ leaf_202 }}"
         - "{{ leaf_201_202 }}"
+
+    - name: Sleep for 2 seconds to let the API catch up
+      wait_for:
+        timeout: 2
+      delegate_to: localhost
 
     - name: "Add leaf selector (infraLeafS) to switch profiles (infraNodeP)"
       aci_switch_leaf_selector:
@@ -183,8 +190,6 @@
         to: "{{ item.swp.to }}"
         state: present
       delegate_to: localhost
-      register: infraLeafS
-      when: infraNodeP.changed
       tags: leaf_swp
       with_items:
         - "{{ leaf_201 }}"
@@ -199,7 +204,6 @@
         interface_selector: "{{ item.name }}_ifp"
         state: present
       delegate_to: localhost
-      when: infraLeafS.changed
       tags: leaf_swp
       with_items:
         - "{{ leaf_201 }}"
@@ -234,9 +238,9 @@
         leaf_interface_profile: "{{ item.name }}_ifp"
         access_port_selector: "{{ item.ifp.acc_port_sel }}"
         leaf_port_blk: "{{ item.ifp.leaf_port_blk }}"
-        from_port: "{{ switch_port }}"
-        to_port: "{{ switch_port }}"
-        policy_group: Heroes_standard_access
+        from_port: "{{ item.ifp.from_port }}"
+        to_port: "{{ item.ifp.to_port }}"
+        policy_group: "{{ item.ifp.ipg }}"
         state: present
       delegate_to: localhost
       with_items:
