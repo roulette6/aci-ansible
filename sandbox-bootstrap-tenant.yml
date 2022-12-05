@@ -1,0 +1,181 @@
+---
+# This playbook is meant to be a simple bootstrap of an ACI sandbox
+# once the fabric has been discovered. The playbook expects a small
+# fabric with spine-201, leaf-201, and leaf-202. The playbook will
+# create the following:
+
+# FABRIC:
+# Three leaf switch profiles and leaf interface profiles, two
+# access port selectors, and one vPC port selector, with
+# corresponding IPG requirements.
+
+# TENANT:
+# One tenant, VRF, BD, AP, and EPG. Static path bindings to
+# all three interfaces.
+
+# ansible-playbook sandbox-bootstrap-tenant.yml --extra-vars "apic=aci.vm.jm"
+
+- name: "Create a bunch of stuff"
+  hosts: "{{ apic }}"
+  ignore_errors: true
+
+  vars:
+    login_info: &login_info
+      host: "{{ inventory_hostname }}"
+      username: "{{ ansible_user }}"
+      password: "{{ ansible_password }}"
+      validate_certs: false
+    rollback_file: ce2_defaultOneTime-2022-12-03T12-09-33.tar.gz
+    ipg:
+      access: single_apg
+      vpc: core-fw01_vpc
+    leaf_201:
+      name: leaf-201
+      swp:
+        leaf_sel: leaf-201_sel
+        node_block: one
+        from: "201"
+        to: "201"
+      ifp:
+        ipg: single_apg
+        acc_port_sel: "eth1_2"
+        leaf_port_blk: block2
+        from_port: "2"
+        to_port: "2"
+    leaf_202:
+      name: leaf-202
+      swp:
+        leaf_sel: leaf-202_sel
+        node_block: two
+        from: "202"
+        to: "202"
+      ifp:
+        ipg: single_apg
+        acc_port_sel: "eth1_2"
+        leaf_port_blk: block2
+        from_port: "2"
+        to_port: "2"
+      policy_group: single_apg
+    leaf_201_202:
+      name: leaf-201_202
+      swp:
+        leaf_sel: leaf-201_202_sel
+        node_block: three
+        from: 201
+        to: 202
+      ifp:
+        ipg: core-fw01_vpc
+        acc_port_sel: "eth1_1_core-fw01"
+        leaf_port_blk: block2
+        from_port: "1"
+        to_port: "1"
+    tenant: DiamondDogs
+    vrf: DD_vrf
+    bd:
+      name: DD_bd
+      mac_addr: "00:22:BD:F8:19:FE"
+    ap: DD_ap
+    epg: DD_epg
+    vlan_id: 666
+    epg_descr: "{{ DD_epg created by Ansible }}"
+    static_paths:
+      encap_id: 666
+      immediacy: immediate
+      pod_id: 1
+      paths:
+        - leafs: 201
+          intf_type: switch_port
+          intf: "1/2"
+          intf_mode: untagged
+        - leafs: 202
+          intf_type: switch_port
+          intf: "1/2"
+          intf_mode: 802.1p
+        - leafs: 201-202
+          intf_type: vpc
+          intf: "eth1_1_core-fw01"
+          intf_mode: tagged
+    vlan_pool: DD_vlan-pool
+    block_start: 660
+    block_end: 669
+    domain: DD_domain
+    domain_type: phys
+
+  tasks:
+    - name: "Create {{ tenant }} tenant"
+      aci_tenant:
+        <<: *login_info
+
+        tenant: "{{ tenant }}"
+        state: present
+      delegate_to: localhost
+
+    - name: "Create {{ vrf }} VRF"
+      aci_vrf:
+        <<: *login_info
+
+        tenant: "{{ tenant }}"
+        vrf: "{{ vrf }}"
+        state: present
+      delegate_to: localhost
+
+    - name: "Create {{ bd.name }} bridge domain"
+      aci_bd:
+        <<: *login_info
+
+        tenant: "{{ tenant }}"
+        vrf: "{{ vrf }}"
+        bd: "{{ bd.name }}"
+        mac_address: "{{ bd.mac_addr }}"
+        state: present
+      delegate_to: localhost
+
+    - name: "Create {{ ap }} application profile"
+      aci_ap:
+        <<: *login_info
+
+        tenant: "{{ tenant }}"
+        ap: "{{ ap }}"
+        state: present
+      delegate_to: localhost
+
+    - name: "Create {{ epg }} end point group"
+      aci_epg:
+        <<: *login_info
+
+        tenant: "{{ tenant }}"
+        bd: "{{ bd.name }}"
+        ap: "{{ ap }}"
+        epg: "{{ epg }}"
+        state: present
+      delegate_to: localhost
+
+    - name: "Bind {{ epg }} to {{ domain }}"
+      aci_epg_to_domain:
+        <<: *login_info
+
+        tenant: "{{ tenant }}"
+        ap: "{{ ap }}"
+        epg: "{{ epg }}"
+        domain: "{{ domain }}"
+        domain_type: "{{ domain_type }}"
+        state: present
+      delegate_to: localhost
+
+    - name: "Create static path bindings for {{ epg }}"
+      aci_static_binding_to_epg:
+        <<: *login_info
+
+        tenant: "{{ tenant }}"
+        ap: "{{ ap }}"
+        epg: "{{ epg }}"
+        pod_id: "{{ static_paths.pod_id }}"
+        leafs: "{{ item.leafs }}"
+        interface_type: "{{ item.intf_type }}"
+        interface_mode: "{{ item.intf_mode }}"
+        interface: "{{ item.intf }}"
+        encap_id: "{{ static_paths.encap_id }}"
+        deploy_immediacy: "{{ static_paths.immediacy }}"
+        state: present
+      delegate_to: localhost
+      with_items: "{{ static_paths.paths }}"
