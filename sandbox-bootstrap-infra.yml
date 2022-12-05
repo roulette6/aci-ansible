@@ -70,12 +70,6 @@
         from_port: "1"
         to_port: "1"
     tenant: DiamondDogs
-    vrf: DD_vrf
-    bd: DD_bd
-    ap: DD_ap
-    epg: DD_epg
-    vlan_id: 666
-    epg_descr: "{{ DD_epg created by Ansible }}"
     vlan_pool: DD_vlan-pool
     block_start: 660
     block_end: 669

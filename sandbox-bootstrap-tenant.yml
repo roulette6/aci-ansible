@@ -25,50 +25,6 @@
       username: "{{ ansible_user }}"
       password: "{{ ansible_password }}"
       validate_certs: false
-    rollback_file: ce2_defaultOneTime-2022-12-03T12-09-33.tar.gz
-    ipg:
-      access: single_apg
-      vpc: core-fw01_vpc
-    leaf_201:
-      name: leaf-201
-      swp:
-        leaf_sel: leaf-201_sel
-        node_block: one
-        from: "201"
-        to: "201"
-      ifp:
-        ipg: single_apg
-        acc_port_sel: "eth1_2"
-        leaf_port_blk: block2
-        from_port: "2"
-        to_port: "2"
-    leaf_202:
-      name: leaf-202
-      swp:
-        leaf_sel: leaf-202_sel
-        node_block: two
-        from: "202"
-        to: "202"
-      ifp:
-        ipg: single_apg
-        acc_port_sel: "eth1_2"
-        leaf_port_blk: block2
-        from_port: "2"
-        to_port: "2"
-      policy_group: single_apg
-    leaf_201_202:
-      name: leaf-201_202
-      swp:
-        leaf_sel: leaf-201_202_sel
-        node_block: three
-        from: 201
-        to: 202
-      ifp:
-        ipg: core-fw01_vpc
-        acc_port_sel: "eth1_1_core-fw01"
-        leaf_port_blk: block2
-        from_port: "1"
-        to_port: "1"
     tenant: DiamondDogs
     vrf: DD_vrf
     bd:
@@ -77,7 +33,7 @@
     ap: DD_ap
     epg: DD_epg
     vlan_id: 666
-    epg_descr: "{{ DD_epg created by Ansible }}"
+    descr: "Created by Ansible for Diamond Dogs"
     static_paths:
       encap_id: 666
       immediacy: immediate
@@ -102,11 +58,12 @@
     domain_type: phys
 
   tasks:
-    - name: "Create {{ tenant }} tenant"
+    - name: "Create tenant }} ten"
       aci_tenant:
         <<: *login_info
 
         tenant: "{{ tenant }}"
+        description: "{{ descr }}"
         state: present
       delegate_to: localhost
 
@@ -116,6 +73,7 @@
 
         tenant: "{{ tenant }}"
         vrf: "{{ vrf }}"
+        description: "{{ descr }}"
         state: present
       delegate_to: localhost
 
@@ -127,6 +85,7 @@
         vrf: "{{ vrf }}"
         bd: "{{ bd.name }}"
         mac_address: "{{ bd.mac_addr }}"
+        description: "{{ descr }}"
         state: present
       delegate_to: localhost
 
@@ -136,6 +95,7 @@
 
         tenant: "{{ tenant }}"
         ap: "{{ ap }}"
+        description: "{{ descr }}"
         state: present
       delegate_to: localhost
 
@@ -147,6 +107,7 @@
         bd: "{{ bd.name }}"
         ap: "{{ ap }}"
         epg: "{{ epg }}"
+        description: "{{ descr }}"
         state: present
       delegate_to: localhost
 
