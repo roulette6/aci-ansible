@@ -15,7 +15,7 @@
 
 # ansible-playbook sandbox-bootstrap-infra.yml --extra-vars "apic=aci.vm.jm"
 
-- name: "Create a bunch of stuff"
+- name: "Create fabric access policies"
   hosts: "{{ apic }}"
   ignore_errors: true
 
@@ -26,6 +26,7 @@
       password: "{{ ansible_password }}"
       validate_certs: false
     rollback_file: ce2_defaultOneTime-2022-12-03T12-09-33.tar.gz
+    gui_alias: "ACI sandbox"
     ipg:
       access: single_apg
       vpc: core-fw01_vpc
@@ -99,7 +100,25 @@
       delegate_to: localhost
       tags: rollback
 
-    - name: Create VLAN pool
+    - name: Set GUI alias
+      aci_rest:
+        <<: *login_info
+
+        path: "/api/node/mo/uni/userext/preloginbanner.json"
+        method: post
+        content:
+          aaaPreLoginBanner:
+            attributes:
+              dn: uni/userext/preloginbanner
+              guiTextMessage: "{{ gui_alias }}"
+              message: APIC - ACI sandbox
+              switchMessage: Switch - ACI sandbox
+              isGuiMessageText: 'true'
+              guiMessage: ACI sandbox
+            children: []
+      delegate_to: localhost
+
+    - name: "Create VLAN pool"
       aci_vlan_pool:
         <<: *login_info
 
@@ -169,7 +188,7 @@
         - "{{ leaf_202 }}"
         - "{{ leaf_201_202 }}"
 
-    - name: Sleep for 2 seconds to let the API catch up
+    - name: "Sleep for 2 seconds to let the API catch up"
       wait_for:
         timeout: 2
       delegate_to: localhost
@@ -191,7 +210,7 @@
         - "{{ leaf_202 }}"
         - "{{ leaf_201_202 }}"
 
-    - name: Associate swp (infraNodeP) with ifp (infraAccPortP)
+    - name: "Associate swp (infraNodeP) with ifp (infraAccPortP)"
       aci_interface_selector_to_switch_policy_leaf_profile:
         <<: *login_info
 
@@ -205,7 +224,7 @@
         - "{{ leaf_202 }}"
         - "{{ leaf_201_202 }}"
 
-    - name: Create access port IPG
+    - name: "Create access port IPG"
       aci_interface_policy_leaf_policy_group:
         <<: *login_info
 
@@ -215,7 +234,7 @@
         state: present
       delegate_to: localhost
 
-    - name: Create VPC IPG
+    - name: "Create VPC IPG"
       aci_interface_policy_leaf_policy_group:
         <<: *login_info
 
@@ -226,7 +245,7 @@
         state: present
       delegate_to: localhost
 
-    - name: "Create access port selector"
+    - name: "Create access port selectors"
       aci_access_port_to_interface_policy_leaf_profile:
         <<: *login_info
 

@@ -15,7 +15,7 @@
 
 # ansible-playbook sandbox-bootstrap-tenant.yml --extra-vars "apic=aci.vm.jm"
 
-- name: "Create a bunch of stuff"
+- name: "Create tenant components"
   hosts: "{{ apic }}"
   ignore_errors: true
 
@@ -58,7 +58,7 @@
     domain_type: phys
 
   tasks:
-    - name: "Create tenant }} ten"
+    - name: "Create {{ tenant }} tenant"
       aci_tenant:
         <<: *login_info
 
