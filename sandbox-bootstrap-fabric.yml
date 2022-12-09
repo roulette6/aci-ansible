@@ -13,7 +13,7 @@
 # One tenant, VRF, BD, AP, and EPG. Static path bindings to
 # all three interfaces.
 
-# ansible-playbook sandbox-bootstrap-infra.yml --extra-vars "apic=aci.vm.jm"
+# ansible-playbook sandbox-bootstrap-fabric.yml --extra-vars "apic=aci.vm.jm"
 
 - name: "Create fabric access policies"
   hosts: "{{ apic }}"
