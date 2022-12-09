@@ -1,0 +1,136 @@
+---
+# This playbook is for registering the ACI fabric once the simulator
+# has a mgmt IP address. The playbook will register the first leaf,
+# then the spine and last leaf, creating a vPC pair between the
+# leaf nodes. The names will be leaf-201, spine-101, leaf-202.
+
+# ansible-playbook sandbox-bootstrap-register-switches.yml --extra-vars "apic=aci.vm.jm"
+
+- name: "Register three switches"
+  hosts: "{{ apic }}"
+  ignore_errors: true
+
+  vars:
+    login_info: &login_info
+      host: "{{ inventory_hostname }}"
+      username: "{{ ansible_user }}"
+      password: "{{ ansible_password }}"
+      validate_certs: false
+
+  tasks:
+    - name: "Register leaf 201"
+      aci_rest:
+        <<: *login_info
+
+        path: /api/node/mo/uni/controller/nodeidentpol/nodep-TEP-1-101.json
+        method: post
+        content:
+          fabricNodeIdentP:
+            attributes:
+              dn: uni/controller/nodeidentpol/nodep-TEP-1-101
+              serial: TEP-1-101
+              nodeId: '201'
+              name: leaf-201
+              role: leaf
+              rn: nodep-TEP-1-101
+              status: created
+            children: []
+      delegate_to: localhost
+
+    - name: "Wait 65 seconds to discover spine"
+      wait_for:
+        timeout: 65
+      delegate_to: localhost
+
+    - name: "Register spine 101"
+      aci_rest:
+        <<: *login_info
+
+        path: /api/node/mo/uni/controller/nodeidentpol/nodep-TEP-1-103.json
+        method: post
+        content:
+          fabricNodeIdentP:
+            attributes:
+              dn: uni/controller/nodeidentpol/nodep-TEP-1-103
+              serial: TEP-1-103
+              nodeId: '101'
+              name: spine-101
+              role: spine
+              rn: nodep-TEP-1-103
+              status: created
+            children: []
+      delegate_to: localhost
+
+    - name: "Wait 85 seconds to discover second leaf"
+      wait_for:
+        timeout: 85
+      delegate_to: localhost
+
+    - name: "Register leaf 202 and create vPC 201"
+      aci_rest:
+        <<: *login_info
+
+        path: /api/node/mo/uni.json
+        method: post
+        content:
+          polUni:
+            attributes:
+              dn: uni
+              status: modified
+            children:
+            - ctrlrInst:
+                attributes:
+                  dn: uni/controller
+                  status: modified
+                children:
+                - fabricNodeIdentPol:
+                    attributes:
+                      dn: uni/controller/nodeidentpol
+                      status: modified
+                    children:
+                    - fabricNodeIdentP:
+                        attributes:
+                          dn: uni/controller/nodeidentpol/nodep-TEP-1-102
+                          serial: TEP-1-102
+                          nodeId: '202'
+                          name: leaf-202
+                          role: leaf
+                          rn: nodep-TEP-1-102
+                          status: created
+                        children: []
+            - fabricInst:
+                attributes:
+                  dn: uni/fabric
+                  status: modified
+                children:
+                - fabricProtPol:
+                    attributes:
+                      dn: uni/fabric/protpol
+                      status: modified
+                    children:
+                    - fabricExplicitGEp:
+                        attributes:
+                          dn: uni/fabric/protpol/expgep-vpc-explictGrp1202201
+                          name: vpc-explictGrp1202201
+                          id: '201'
+                        children:
+                        - fabricNodePEp:
+                            attributes:
+                              dn: uni/fabric/protpol/expgep-vpc-explictGrp1202201/nodepep-201
+                              id: '201'
+                              status: created
+                              rn: nodepep-201
+                            children: []
+                        - fabricNodePEp:
+                            attributes:
+                              dn: uni/fabric/protpol/expgep-vpc-explictGrp1202201/nodepep-202
+                              id: '202'
+                              status: created
+                              rn: nodepep-202
+                            children: []
+                        - fabricRsVpcInstPol:
+                            attributes:
+                              tnVpcInstPolName: default
+                              status: created,modified
+                            children: []
+      delegate_to: localhost
