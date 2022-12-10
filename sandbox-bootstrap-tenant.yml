@@ -62,6 +62,7 @@
       aci_tenant:
         <<: *login_info
 
+        annotation: "orchestrator:ansible"
         tenant: "{{ tenant }}"
         description: "{{ descr }}"
         state: present
@@ -71,6 +72,7 @@
       aci_vrf:
         <<: *login_info
 
+        annotation: "orchestrator:ansible"
         tenant: "{{ tenant }}"
         vrf: "{{ vrf }}"
         description: "{{ descr }}"
@@ -81,6 +83,7 @@
       aci_bd:
         <<: *login_info
 
+        annotation: "orchestrator:ansible"
         tenant: "{{ tenant }}"
         vrf: "{{ vrf }}"
         bd: "{{ bd.name }}"
@@ -93,6 +96,7 @@
       aci_ap:
         <<: *login_info
 
+        annotation: "orchestrator:ansible"
         tenant: "{{ tenant }}"
         ap: "{{ ap }}"
         description: "{{ descr }}"
@@ -103,6 +107,7 @@
       aci_epg:
         <<: *login_info
 
+        annotation: "orchestrator:ansible"
         tenant: "{{ tenant }}"
         bd: "{{ bd.name }}"
         ap: "{{ ap }}"
@@ -115,6 +120,7 @@
       aci_epg_to_domain:
         <<: *login_info
 
+        annotation: "orchestrator:ansible"
         tenant: "{{ tenant }}"
         ap: "{{ ap }}"
         epg: "{{ epg }}"
@@ -127,6 +133,7 @@
       aci_static_binding_to_epg:
         <<: *login_info
 
+        annotation: "orchestrator:ansible"
         tenant: "{{ tenant }}"
         ap: "{{ ap }}"
         epg: "{{ epg }}"

@@ -25,7 +25,7 @@
       username: "{{ ansible_user }}"
       password: "{{ ansible_password }}"
       validate_certs: false
-    rollback_file: ce2_defaultOneTime-2022-12-03T12-09-33.tar.gz
+    rollback_file: "ce2_defaultOneTime-2022-12-08T22-35-59.tar.gz"
     gui_alias: "ACI sandbox"
     ipg:
       access: single_apg
@@ -122,6 +122,7 @@
       aci_vlan_pool:
         <<: *login_info
 
+        annotation: "orchestrator:ansible"
         pool: "{{ vlan_pool }}"
         pool_allocation_mode: static
         description: Diamond Dogs VLANs
@@ -132,6 +133,7 @@
       aci_vlan_pool_encap_block:
         <<: *login_info
 
+        annotation: "orchestrator:ansible"
         pool: "{{ vlan_pool }}"
         pool_allocation_mode: static
         block_name: "DD-encaps-block"
@@ -144,6 +146,7 @@
       aci_domain:
         <<: *login_info
 
+        annotation: "orchestrator:ansible"
         domain: "{{ domain }}"
         domain_type: "{{ domain_type }}"
         state: present
@@ -153,6 +156,7 @@
       aci_domain_to_vlan_pool:
         <<: *login_info
 
+        annotation: "orchestrator:ansible"
         domain: "{{ domain }}"
         domain_type: "{{ domain_type }}"
         pool: "{{ vlan_pool }}"
@@ -164,6 +168,7 @@
       aci_interface_policy_leaf_profile:
         <<: *login_info
 
+        annotation: "orchestrator:ansible"
         leaf_interface_profile: "{{ item.name }}_ifp"
         description: Created by Ansible
         state: present
@@ -178,6 +183,7 @@
       aci_switch_policy_leaf_profile:
         <<: *login_info
 
+        annotation: "orchestrator:ansible"
         leaf_profile: "{{ item.name }}_swp"
         description: Created by Ansible
         state: present
@@ -197,6 +203,7 @@
       aci_switch_leaf_selector:
         <<: *login_info
 
+        annotation: "orchestrator:ansible"
         leaf_profile: "{{ item.name }}_swp"
         leaf: "{{ item.name }}_sel"
         leaf_node_blk: "{{ item.swp.node_block }}"
@@ -214,6 +221,7 @@
       aci_interface_selector_to_switch_policy_leaf_profile:
         <<: *login_info
 
+        annotation: "orchestrator:ansible"
         leaf_profile: "{{ item.name }}_swp"
         interface_selector: "{{ item.name }}_ifp"
         state: present
@@ -228,6 +236,7 @@
       aci_interface_policy_leaf_policy_group:
         <<: *login_info
 
+        annotation: "orchestrator:ansible"
         lag_type: leaf
         policy_group: "{{ ipg.access }}"
         lldp_policy: system-lldp-enabled
@@ -238,6 +247,7 @@
       aci_interface_policy_leaf_policy_group:
         <<: *login_info
 
+        annotation: "orchestrator:ansible"
         lag_type: node
         policy_group: "{{ ipg.vpc }}"
         port_channel_policy: system-lacp-active
@@ -249,11 +259,10 @@
       aci_access_port_to_interface_policy_leaf_profile:
         <<: *login_info
 
+        annotation: "orchestrator:ansible"
         leaf_interface_profile: "{{ item.name }}_ifp"
         access_port_selector: "{{ item.ifp.acc_port_sel }}"
-        leaf_port_blk: "{{ item.ifp.leaf_port_blk }}"
-        from_port: "{{ item.ifp.from_port }}"
-        to_port: "{{ item.ifp.to_port }}"
+        description: "{{ item.ifp.acc_port_sel }} Created by Ansible"
         policy_group: "{{ item.ifp.ipg }}"
         state: present
       delegate_to: localhost
@@ -262,3 +271,26 @@
         - "{{ leaf_202 }}"
         - "{{ leaf_201_202 }}"
       tags: port
+
+    - name: "Sleep for 2 seconds to let the API catch up"
+      wait_for:
+        timeout: 2
+      delegate_to: localhost
+
+    - name: "Associate port blocks with access port selectors"
+      aci_access_port_block_to_access_port:
+        <<: *login_info
+
+        annotation: "orchestrator:ansible"
+        interface_profile: "{{ item.name }}_ifp"
+        access_port_selector: "{{ item.ifp.acc_port_sel }}"
+        port_blk: "{{ item.ifp.leaf_port_blk }}"
+        port_blk_description: "{{ item.ifp.acc_port_sel }}"
+        from_port: "{{ item.ifp.from_port }}"
+        to_port: "{{ item.ifp.to_port }}"
+        state: present
+      delegate_to: localhost
+      with_items:
+        - "{{ leaf_201 }}"
+        - "{{ leaf_202 }}"
+        - "{{ leaf_201_202 }}"
