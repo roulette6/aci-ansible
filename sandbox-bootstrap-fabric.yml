@@ -193,11 +193,8 @@
         - "{{ leaf_201 }}"
         - "{{ leaf_202 }}"
         - "{{ leaf_201_202 }}"
-
-    - name: "Sleep for 2 seconds to let the API catch up"
-      wait_for:
-        timeout: 2
-      delegate_to: localhost
+      loop_control:
+        pause: 1
 
     - name: "Add leaf selector (infraLeafS) to switch profiles (infraNodeP)"
       aci_switch_leaf_selector:
@@ -216,6 +213,8 @@
         - "{{ leaf_201 }}"
         - "{{ leaf_202 }}"
         - "{{ leaf_201_202 }}"
+      loop_control:
+        pause: 1
 
     - name: "Associate swp (infraNodeP) with ifp (infraAccPortP)"
       aci_interface_selector_to_switch_policy_leaf_profile:
@@ -270,14 +269,11 @@
         - "{{ leaf_201 }}"
         - "{{ leaf_202 }}"
         - "{{ leaf_201_202 }}"
+      loop_control:
+        pause: 1
       tags: port
 
-    - name: "Sleep for 2 seconds to let the API catch up"
-      wait_for:
-        timeout: 2
-      delegate_to: localhost
-
-    - name: "Associate port blocks with access port selectors"
+    - name: "Create port blocks for port selectors"
       aci_access_port_block_to_access_port:
         <<: *login_info
 
