@@ -254,6 +254,11 @@
         state: present
       delegate_to: localhost
 
+    - name: "Wait one second"
+      wait_for:
+        timeout: 1
+      delegate_to: localhost
+
     - name: "Create access port selectors"
       aci_access_port_to_interface_policy_leaf_profile:
         <<: *login_info
