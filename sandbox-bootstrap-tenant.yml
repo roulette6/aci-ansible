@@ -21,92 +21,113 @@
       validate_certs: false
 
   tasks:
-    - name: "Create {{ tenant }} tenant"
+
+    - name: "Create tenants"
       aci_tenant:
         <<: *login_info
 
         annotation: "orchestrator:ansible"
-        tenant: "{{ tenant }}"
-        description: "{{ descr }}"
+        tenant: "{{ item.tenant }}"
+        description: "{{ item.descr }}"
         state: present
       delegate_to: localhost
+      with_items: "{{ tenants }}"
 
-    - name: "Create {{ vrf }} VRF"
+
+    - name: "Create VRFs"
       aci_vrf:
         <<: *login_info
 
         annotation: "orchestrator:ansible"
-        tenant: "{{ tenant }}"
-        vrf: "{{ vrf }}"
-        description: "{{ descr }}"
+        tenant: "{{ item.tenant }}"
+        vrf: "{{ item.vrf }}"
+        description: "{{ item.descr }}"
         state: present
       delegate_to: localhost
+      with_items: "{{ tenants }}"
 
-    - name: "Create {{ bd.name }} bridge domain"
+
+    - name: "Create bridge domains"
       aci_bd:
         <<: *login_info
 
         annotation: "orchestrator:ansible"
-        tenant: "{{ tenant }}"
-        vrf: "{{ vrf }}"
-        bd: "{{ bd.name }}"
-        mac_address: "{{ bd.mac_addr }}"
-        description: "{{ descr }}"
+        tenant: "{{ item.tenant }}"
+        vrf: "{{ item.vrf }}"
+        bd: "{{ item.bd }}"
+        description: "{{ item.descr }}"
         state: present
       delegate_to: localhost
+      with_items: "{{ tenants }}"
+      loop_control:
+        pause: 1
 
-    - name: "Create {{ ap }} application profile"
+    - name: "Create application profiles"
       aci_ap:
         <<: *login_info
 
         annotation: "orchestrator:ansible"
-        tenant: "{{ tenant }}"
-        ap: "{{ ap }}"
-        description: "{{ descr }}"
+        tenant: "{{ item.tenant }}"
+        ap: "{{ item.ap }}"
+        description: "{{ item.descr }}"
         state: present
       delegate_to: localhost
+      with_items: "{{ tenants }}"
+      loop_control:
+        pause: 1
 
-    - name: "Create {{ epg }} end point group"
+
+    - name: "Create end point groups"
       aci_epg:
         <<: *login_info
 
         annotation: "orchestrator:ansible"
-        tenant: "{{ tenant }}"
-        bd: "{{ bd.name }}"
-        ap: "{{ ap }}"
-        epg: "{{ epg }}"
-        description: "{{ descr }}"
+        tenant: "{{ item.tenant }}"
+        bd: "{{ item.bd }}"
+        ap: "{{ item.ap }}"
+        epg: "{{ item.epg }}"
+        description: "{{ item.descr }}"
         state: present
       delegate_to: localhost
+      with_items: "{{ tenants }}"
+      loop_control:
+        pause: 1
 
-    - name: "Bind {{ epg }} to {{ domain }}"
+
+    - name: "Bind EPGs to domains"
       aci_epg_to_domain:
         <<: *login_info
 
         annotation: "orchestrator:ansible"
-        tenant: "{{ tenant }}"
-        ap: "{{ ap }}"
-        epg: "{{ epg }}"
-        domain: "{{ domain }}"
-        domain_type: "{{ domain_type }}"
+        tenant: "{{ item.tenant }}"
+        ap: "{{ item.ap }}"
+        epg: "{{ item.epg }}"
+        domain: "{{ item.domain }}"
+        domain_type: "{{ item.domain_type }}"
         state: present
       delegate_to: localhost
+      with_items: "{{ tenants }}"
 
-    - name: "Create static path bindings for {{ epg }}"
+
+    - name: "Create static path bindings"
       aci_static_binding_to_epg:
         <<: *login_info
 
         annotation: "orchestrator:ansible"
-        tenant: "{{ tenant }}"
-        ap: "{{ ap }}"
-        epg: "{{ epg }}"
-        pod_id: "{{ static_paths.pod_id }}"
+        tenant: "{{ item.tenant }}"
+        ap: "{{ item.ap }}"
+        epg: "{{ item.epg }}"
+        pod_id: "{{ item.pod_id }}"
         leafs: "{{ item.leafs }}"
         interface_type: "{{ item.intf_type }}"
         interface_mode: "{{ item.intf_mode }}"
         interface: "{{ item.intf }}"
-        encap_id: "{{ static_paths.encap_id }}"
-        deploy_immediacy: "{{ static_paths.immediacy }}"
+        encap_id: "{{ item.encap_id }}"
+        deploy_immediacy: "{{ item.immediacy }}"
         state: present
       delegate_to: localhost
-      with_items: "{{ static_paths.paths }}"
+      with_items:
+        - "{{ tenants[0].static_paths }}"
+        - "{{ tenants[1].static_paths }}"
+        - "{{ tenants[2].static_paths }}"
+      tags: spath

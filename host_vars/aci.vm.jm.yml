@@ -14,7 +14,7 @@ leaf_201:
     to: "201"
   ifp:
     ipg: single_apg
-    acc_port_sel: "eth1_2"
+    acc_port_sel: "eth1_2_DD"
     leaf_port_blk: block2
     from_port: "2"
     to_port: "2"
@@ -28,7 +28,7 @@ leaf_202:
     to: "202"
   ifp:
     ipg: single_apg
-    acc_port_sel: "eth1_2"
+    acc_port_sel: "eth1_2_DD"
     leaf_port_blk: block2
     from_port: "2"
     to_port: "2"
@@ -48,35 +48,139 @@ leaf_201_202:
     from_port: "1"
     to_port: "1"
 
-vlan_pool: DD_vlan-pool
-block_start: 660
-block_end: 669
-domain: DD_domain
-domain_type: phys
-tenant: DiamondDogs
-vrf: DD_vrf
-bd:
-  name: DD_bd
-  mac_addr: "00:22:BD:F8:19:FE"
-ap: DD_ap
-epg: DD_epg
-vlan_id: 666
-descr: "Created by Ansible for Diamond Dogs"
-static_paths:
-  encap_id: 666
-  immediacy: immediate
-  pod_id: 1
-  paths:
-    - leafs: 201
-      intf_type: switch_port
-      intf: "1/2"
-      intf_mode: untagged
-    - leafs: 202
-      intf_type: switch_port
-      intf: "1/2"
-      intf_mode: 802.1p
-    - leafs: 201-202
-      intf_type: vpc
-      intf: "eth1_1_core-fw01"
-      intf_mode: tagged
+tenants:
+  - tenant: DiamondDogs
+    vlan_pool: DD_vlan-pool
+    block_start: 660
+    block_end: 669
+    domain: DD_domain
+    domain_type: phys
+    vrf: DD_vrf
+    bd: DD_bd
+    ap: DD_ap
+    epg: DD_epg
+    vlan_id: 666
+    descr: "Created by Ansible for Diamond Dogs"
+    static_paths:
+      - leafs: 201
+        tenant: DiamondDogs
+        bd: DD_bd
+        ap: DD_ap
+        epg: DD_epg
+        intf_type: switch_port
+        intf: "1/2"
+        intf_mode: untagged
+        encap_id: 666
+        immediacy: immediate
+        pod_id: 1
+      - leafs: 202
+        tenant: DiamondDogs
+        bd: DD_bd
+        ap: DD_ap
+        epg: DD_epg
+        intf_type: switch_port
+        intf: "1/2"
+        intf_mode: 802.1p
+        encap_id: 666
+        immediacy: immediate
+        pod_id: 1
+      - leafs: 201-202
+        tenant: DiamondDogs
+        bd: DD_bd
+        ap: DD_ap
+        epg: DD_epg
+        intf_type: vpc
+        intf: "eth1_1_core-fw01"
+        intf_mode: tagged
+        encap_id: 666
+        immediacy: immediate
+        pod_id: 1
+
+  - tenant: CobraUnit
+    vlan_pool: Cobra_vlan-pool
+    block_start: 670
+    block_end: 679
+    domain: Cobra_domain
+    domain_type: phys
+    vrf: Cobra_vrf
+    bd: Cobra_bd
+    ap: Cobra_ap
+    epg: Cobra_epg
+    vlan_id: 677
+    descr: "Created by Ansible for Diamond Dogs"
+    static_paths:
+      - leafs: 201
+        tenant: CobraUnit
+        ap: Cobra_ap
+        epg: Cobra_epg
+        intf_type: switch_port
+        intf: "1/3"
+        intf_mode: untagged
+        encap_id: 677
+        immediacy: immediate
+        pod_id: 1
+      - leafs: 202
+        tenant: CobraUnit
+        ap: Cobra_ap
+        epg: Cobra_epg
+        intf_type: switch_port
+        intf: "1/3"
+        intf_mode: 802.1p
+        encap_id: 677
+        immediacy: immediate
+        pod_id: 1
+      - leafs: 201-202
+        tenant: CobraUnit
+        ap: Cobra_ap
+        epg: Cobra_epg
+        intf_type: vpc
+        intf: "eth1_1_core-fw01"
+        intf_mode: tagged
+        encap_id: 677
+        immediacy: immediate
+        pod_id: 1
+
+  - tenant: FOX
+    vlan_pool: Fox_vlan-pool
+    block_start: 680
+    block_end: 689
+    domain: Fox_domain
+    domain_type: phys
+    vrf: Fox_vrf
+    bd: Fox_bd
+    ap: Fox_ap
+    epg: Fox_epg
+    vlan_id: 688
+    descr: "Created by Ansible for FOX Unit"
+    static_paths:
+      - leafs: 201
+        tenant: FOX
+        ap: Fox_ap
+        epg: Fox_epg
+        intf_type: switch_port
+        intf: "1/4"
+        intf_mode: untagged
+        encap_id: 688
+        immediacy: immediate
+        pod_id: 1
+      - leafs: 202
+        tenant: FOX
+        ap: Fox_ap
+        epg: Fox_epg
+        intf_type: switch_port
+        intf: "1/4"
+        intf_mode: 802.1p
+        encap_id: 688
+        immediacy: immediate
+        pod_id: 1
+      - leafs: 201-202
+        tenant: FOX
+        ap: Fox_ap
+        epg: Fox_epg
+        intf_type: vpc
+        intf: "eth1_1_core-fw01"
+        intf_mode: tagged
+        encap_id: 688
+        immediacy: immediate
+        pod_id: 1
 
