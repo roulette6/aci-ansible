@@ -64,53 +64,62 @@
             children: []
       delegate_to: localhost
 
-    - name: "Create VLAN pool"
+
+    - name: "Create VLAN pools"
       aci_vlan_pool:
         <<: *login_info
 
         annotation: "orchestrator:ansible"
-        pool: "{{ vlan_pool }}"
+        pool: "{{ item.vlan_pool }}"
         pool_allocation_mode: static
         description: Diamond Dogs VLANs
         state: present
       delegate_to: localhost
+      with_items: "{{ tenants }}"
+      loop_control:
+        pause: 1
 
-    - name: "Create VLAN pool encapsulation block"
+    - name: "Create VLAN pool encapsulation blocks"
       aci_vlan_pool_encap_block:
         <<: *login_info
 
         annotation: "orchestrator:ansible"
-        pool: "{{ vlan_pool }}"
+        pool: "{{ item.vlan_pool }}"
         pool_allocation_mode: static
-        block_name: "DD-encaps-block"
-        block_start: "{{ block_start }}"
-        block_end: "{{ block_end }}"
+        block_name: "{{ item.encaps_block }}"
+        block_start: "{{ item.block_start }}"
+        block_end: "{{ item.block_end }}"
         state: present
       delegate_to: localhost
+      with_items: "{{ tenants }}"
 
-    - name: "Create DD physical domain"
+    - name: "Create physical domains"
       aci_domain:
         <<: *login_info
 
         annotation: "orchestrator:ansible"
-        domain: "{{ domain }}"
-        domain_type: "{{ domain_type }}"
+        domain: "{{ item.domain }}"
+        domain_type: "{{ item.domain_type }}"
         state: present
       delegate_to: localhost
+      with_items: "{{ tenants }}"
+      loop_control:
+        pause: 1
 
-    - name: "Bind phydom {{ domain }} to VLAN pool {{ vlan_pool }}"
+    - name: "Bind physical domains to VLAN pools"
       aci_domain_to_vlan_pool:
         <<: *login_info
 
         annotation: "orchestrator:ansible"
-        domain: "{{ domain }}"
-        domain_type: "{{ domain_type }}"
-        pool: "{{ vlan_pool }}"
+        domain: "{{ item.domain }}"
+        domain_type: "{{ item.domain_type }}"
+        pool: "{{ item.vlan_pool }}"
         pool_allocation_mode: static
         state: present
       delegate_to: localhost
+      with_items: "{{ tenants }}"
 
-    - name: "Create leaf interface profile (infraAccPortP)"
+    - name: "Create leaf interface profiles (infraAccPortP)"
       aci_interface_policy_leaf_profile:
         <<: *login_info
 
@@ -125,7 +134,7 @@
         - "{{ leaf_201_202 }}"
       tags: leaf_ifp
 
-    - name: "Create leaf switch profiles (infraNodeP)"
+    - name: "Create leaf switch profiless (infraNodeP)"
       aci_switch_policy_leaf_profile:
         <<: *login_info
 
@@ -210,16 +219,16 @@
         <<: *login_info
 
         annotation: "orchestrator:ansible"
-        leaf_interface_profile: "{{ item.name }}_ifp"
-        access_port_selector: "{{ item.ifp.acc_port_sel }}"
-        description: "{{ item.ifp.acc_port_sel }} Created by Ansible"
-        policy_group: "{{ item.ifp.ipg }}"
+        leaf_interface_profile: "{{ item.leaf_ifp }}"
+        access_port_selector: "{{ item.acc_port_sel }}"
+        description: "{{ item.acc_port_sel }} Created by Ansible"
+        policy_group: "{{ item.ipg }}"
         state: present
       delegate_to: localhost
       with_items:
-        - "{{ leaf_201 }}"
-        - "{{ leaf_202 }}"
-        - "{{ leaf_201_202 }}"
+        - "{{ leaf_201.ifps }}"
+        - "{{ leaf_202.ifps }}"
+        - "{{ leaf_201_202.ifps }}"
       loop_control:
         pause: 1
       tags: port
@@ -229,15 +238,16 @@
         <<: *login_info
 
         annotation: "orchestrator:ansible"
-        interface_profile: "{{ item.name }}_ifp"
-        access_port_selector: "{{ item.ifp.acc_port_sel }}"
-        port_blk: "{{ item.ifp.leaf_port_blk }}"
-        port_blk_description: "{{ item.ifp.acc_port_sel }}"
-        from_port: "{{ item.ifp.from_port }}"
-        to_port: "{{ item.ifp.to_port }}"
+        interface_profile: "{{ item.leaf_ifp }}"
+        access_port_selector: "{{ item.acc_port_sel }}"
+        port_blk: "{{ item.leaf_port_blk }}"
+        port_blk_description: "{{ item.acc_port_sel }}"
+        from_port: "{{ item.from_port }}"
+        to_port: "{{ item.to_port }}"
         state: present
       delegate_to: localhost
       with_items:
-        - "{{ leaf_201 }}"
-        - "{{ leaf_202 }}"
-        - "{{ leaf_201_202 }}"
+        - "{{ leaf_201.ifps }}"
+        - "{{ leaf_202.ifps }}"
+        - "{{ leaf_201_202.ifps }}"
+      tags: port

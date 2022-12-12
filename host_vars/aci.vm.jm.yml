@@ -12,12 +12,25 @@ leaf_201:
     node_block: one
     from: "201"
     to: "201"
-  ifp:
-    ipg: single_apg
-    acc_port_sel: "eth1_2_DD"
-    leaf_port_blk: block2
-    from_port: "2"
-    to_port: "2"
+  ifps:
+    - ipg: single_apg
+      leaf_ifp: leaf-201_ifp
+      acc_port_sel: "eth1_2_DD"
+      leaf_port_blk: block2
+      from_port: "2"
+      to_port: "2"
+    - ipg: single_apg
+      leaf_ifp: leaf-201_ifp
+      acc_port_sel: "eth1_3_DD"
+      leaf_port_blk: block2
+      from_port: "3"
+      to_port: "3"
+    - ipg: single_apg
+      leaf_ifp: leaf-201_ifp
+      acc_port_sel: "eth1_4_DD"
+      leaf_port_blk: block2
+      from_port: "4"
+      to_port: "4"
 
 leaf_202:
   name: leaf-202
@@ -26,12 +39,25 @@ leaf_202:
     node_block: two
     from: "202"
     to: "202"
-  ifp:
-    ipg: single_apg
-    acc_port_sel: "eth1_2_DD"
-    leaf_port_blk: block2
-    from_port: "2"
-    to_port: "2"
+  ifps:
+    - ipg: single_apg
+      leaf_ifp: leaf-202_ifp
+      acc_port_sel: "eth1_2_DD"
+      leaf_port_blk: block2
+      from_port: "2"
+      to_port: "2"
+    - ipg: single_apg
+      leaf_ifp: leaf-202_ifp
+      acc_port_sel: "eth1_3_DD"
+      leaf_port_blk: block2
+      from_port: "3"
+      to_port: "3"
+    - ipg: single_apg
+      leaf_ifp: leaf-202_ifp
+      acc_port_sel: "eth1_4_DD"
+      leaf_port_blk: block2
+      from_port: "4"
+      to_port: "4"
   policy_group: single_apg
 
 leaf_201_202:
@@ -41,16 +67,18 @@ leaf_201_202:
     node_block: three
     from: 201
     to: 202
-  ifp:
-    ipg: core-fw01_vpc
-    acc_port_sel: "eth1_1_core-fw01"
-    leaf_port_blk: block2
-    from_port: "1"
-    to_port: "1"
+  ifps:
+    - ipg: core-fw01_vpc
+      leaf_ifp: leaf-201_202_ifp
+      acc_port_sel: "eth1_1_core-fw01"
+      leaf_port_blk: block2
+      from_port: "1"
+      to_port: "1"
 
 tenants:
   - tenant: DiamondDogs
     vlan_pool: DD_vlan-pool
+    encaps_block: core-block
     block_start: 660
     block_end: 669
     domain: DD_domain
@@ -98,6 +126,7 @@ tenants:
 
   - tenant: CobraUnit
     vlan_pool: Cobra_vlan-pool
+    encaps_block: core-block
     block_start: 670
     block_end: 679
     domain: Cobra_domain
@@ -142,6 +171,7 @@ tenants:
 
   - tenant: FOX
     vlan_pool: Fox_vlan-pool
+    encaps_block: core-block
     block_start: 680
     block_end: 689
     domain: Fox_domain
