@@ -1,0 +1,82 @@
+---
+gui_alias: "ACI sandbox"
+
+ipg:
+  access: single_apg
+  vpc: core-fw01_vpc
+
+leaf_201:
+  name: leaf-201
+  swp:
+    leaf_sel: leaf-201_sel
+    node_block: one
+    from: "201"
+    to: "201"
+  ifp:
+    ipg: single_apg
+    acc_port_sel: "eth1_2"
+    leaf_port_blk: block2
+    from_port: "2"
+    to_port: "2"
+
+leaf_202:
+  name: leaf-202
+  swp:
+    leaf_sel: leaf-202_sel
+    node_block: two
+    from: "202"
+    to: "202"
+  ifp:
+    ipg: single_apg
+    acc_port_sel: "eth1_2"
+    leaf_port_blk: block2
+    from_port: "2"
+    to_port: "2"
+  policy_group: single_apg
+
+leaf_201_202:
+  name: leaf-201_202
+  swp:
+    leaf_sel: leaf-201_202_sel
+    node_block: three
+    from: 201
+    to: 202
+  ifp:
+    ipg: core-fw01_vpc
+    acc_port_sel: "eth1_1_core-fw01"
+    leaf_port_blk: block2
+    from_port: "1"
+    to_port: "1"
+
+vlan_pool: DD_vlan-pool
+block_start: 660
+block_end: 669
+domain: DD_domain
+domain_type: phys
+tenant: DiamondDogs
+vrf: DD_vrf
+bd:
+  name: DD_bd
+  mac_addr: "00:22:BD:F8:19:FE"
+ap: DD_ap
+epg: DD_epg
+vlan_id: 666
+descr: "Created by Ansible for Diamond Dogs"
+static_paths:
+  encap_id: 666
+  immediacy: immediate
+  pod_id: 1
+  paths:
+    - leafs: 201
+      intf_type: switch_port
+      intf: "1/2"
+      intf_mode: untagged
+    - leafs: 202
+      intf_type: switch_port
+      intf: "1/2"
+      intf_mode: 802.1p
+    - leafs: 201-202
+      intf_type: vpc
+      intf: "eth1_1_core-fw01"
+      intf_mode: tagged
+

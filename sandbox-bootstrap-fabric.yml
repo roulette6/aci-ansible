@@ -9,73 +9,19 @@
 # access port selectors, and one vPC port selector, with
 # corresponding IPG requirements.
 
-# TENANT:
-# One tenant, VRF, BD, AP, and EPG. Static path bindings to
-# all three interfaces.
-
 # ansible-playbook sandbox-bootstrap-fabric.yml --extra-vars "apic=aci.vm.jm"
 
 - name: "Create fabric access policies"
   hosts: "{{ apic }}"
   ignore_errors: true
-
   vars:
     login_info: &login_info
       host: "{{ inventory_hostname }}"
       username: "{{ ansible_user }}"
       password: "{{ ansible_password }}"
       validate_certs: false
+
     rollback_file: "ce2_defaultOneTime-2022-12-08T22-35-59.tar.gz"
-    gui_alias: "ACI sandbox"
-    ipg:
-      access: single_apg
-      vpc: core-fw01_vpc
-    leaf_201:
-      name: leaf-201
-      swp:
-        leaf_sel: leaf-201_sel
-        node_block: one
-        from: "201"
-        to: "201"
-      ifp:
-        ipg: single_apg
-        acc_port_sel: "eth1_2"
-        leaf_port_blk: block2
-        from_port: "2"
-        to_port: "2"
-    leaf_202:
-      name: leaf-202
-      swp:
-        leaf_sel: leaf-202_sel
-        node_block: two
-        from: "202"
-        to: "202"
-      ifp:
-        ipg: single_apg
-        acc_port_sel: "eth1_2"
-        leaf_port_blk: block2
-        from_port: "2"
-        to_port: "2"
-      policy_group: single_apg
-    leaf_201_202:
-      name: leaf-201_202
-      swp:
-        leaf_sel: leaf-201_202_sel
-        node_block: three
-        from: 201
-        to: 202
-      ifp:
-        ipg: core-fw01_vpc
-        acc_port_sel: "eth1_1_core-fw01"
-        leaf_port_blk: block2
-        from_port: "1"
-        to_port: "1"
-    tenant: DiamondDogs
-    vlan_pool: DD_vlan-pool
-    block_start: 660
-    block_end: 669
-    domain: DD_domain
-    domain_type: phys
 
   tasks:
     - name: Roll back to blank slate config

@@ -4,11 +4,6 @@
 # fabric with spine-201, leaf-201, and leaf-202. The playbook will
 # create the following:
 
-# FABRIC:
-# Three leaf switch profiles and leaf interface profiles, two
-# access port selectors, and one vPC port selector, with
-# corresponding IPG requirements.
-
 # TENANT:
 # One tenant, VRF, BD, AP, and EPG. Static path bindings to
 # all three interfaces.
@@ -18,44 +13,12 @@
 - name: "Create tenant components"
   hosts: "{{ apic }}"
   ignore_errors: true
-
   vars:
     login_info: &login_info
       host: "{{ inventory_hostname }}"
       username: "{{ ansible_user }}"
       password: "{{ ansible_password }}"
       validate_certs: false
-    tenant: DiamondDogs
-    vrf: DD_vrf
-    bd:
-      name: DD_bd
-      mac_addr: "00:22:BD:F8:19:FE"
-    ap: DD_ap
-    epg: DD_epg
-    vlan_id: 666
-    descr: "Created by Ansible for Diamond Dogs"
-    static_paths:
-      encap_id: 666
-      immediacy: immediate
-      pod_id: 1
-      paths:
-        - leafs: 201
-          intf_type: switch_port
-          intf: "1/2"
-          intf_mode: untagged
-        - leafs: 202
-          intf_type: switch_port
-          intf: "1/2"
-          intf_mode: 802.1p
-        - leafs: 201-202
-          intf_type: vpc
-          intf: "eth1_1_core-fw01"
-          intf_mode: tagged
-    vlan_pool: DD_vlan-pool
-    block_start: 660
-    block_end: 669
-    domain: DD_domain
-    domain_type: phys
 
   tasks:
     - name: "Create {{ tenant }} tenant"
