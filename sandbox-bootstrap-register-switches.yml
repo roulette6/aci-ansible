@@ -4,7 +4,7 @@
 # then the spine and last leaf, creating a vPC pair between the
 # leaf nodes. The names will be leaf-201, spine-101, leaf-202.
 
-# ansible-playbook sandbox-bootstrap-register-switches.yml --extra-vars "apic=aci.vm.jm"
+# ansible-playbook sandbox-bootstrap-register-switches.yml --extra-vars "apic=aci-sandbox"
 
 - name: "Register three switches"
   hosts: "{{ apic }}"
@@ -12,7 +12,7 @@
 
   vars:
     login_info: &login_info
-      host: "{{ inventory_hostname }}"
+      host: "{{ host_fqdn }}"
       username: "{{ ansible_user }}"
       password: "{{ ansible_password }}"
       validate_certs: false

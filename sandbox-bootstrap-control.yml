@@ -5,7 +5,7 @@
 # launch two playbooks to create access policies and tenants with
 # their additional objects
 
-# ansible-playbook sandbox-bootstrap-control.yml --extra-vars "apic=aci.vm.jm"
+# ansible-playbook sandbox-bootstrap-control.yml --extra-vars "apic=aci-sandbox"
 
 # - name: "Launch sandbox-bootstrap-fabric.yml and sandbox-bootstrap-tenant.yml"
 #   hosts: "{{ apic }}"

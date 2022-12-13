@@ -84,8 +84,6 @@ tenants:
     encaps_block: DiamondDogs
     block_start: 660
     block_end: 669
-    domain: DD_domain
-    domain_type: phys
     vrf: DD_vrf
     bd: DD_bd
     ap: DD_ap
@@ -130,8 +128,6 @@ tenants:
     encaps_block: CobraUnit
     block_start: 670
     block_end: 679
-    domain: Cobra_domain
-    domain_type: phys
     vrf: Cobra_vrf
     bd: Cobra_bd
     ap: Cobra_ap
@@ -173,8 +169,6 @@ tenants:
     encaps_block: FOX
     block_start: 680
     block_end: 689
-    domain: Fox_domain
-    domain_type: phys
     vrf: Fox_vrf
     bd: Fox_bd
     ap: Fox_ap
@@ -211,4 +205,3 @@ tenants:
         encap_id: 688
         immediacy: immediate
         pod_id: 1
-

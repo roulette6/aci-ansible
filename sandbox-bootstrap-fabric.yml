@@ -9,14 +9,14 @@
 # access port selectors, and one vPC port selector, with
 # corresponding IPG requirements.
 
-# ansible-playbook sandbox-bootstrap-fabric.yml --extra-vars "apic=aci.vm.jm"
+# ansible-playbook sandbox-bootstrap-fabric.yml --extra-vars "apic=aci-sandbox"
 
 - name: "Create fabric access policies"
   hosts: "{{ apic }}"
   ignore_errors: false
   vars:
     login_info: &login_info
-      host: "{{ inventory_hostname }}"
+      host: "{{ host_fqdn }}"
       username: "{{ ansible_user }}"
       password: "{{ ansible_password }}"
       validate_certs: false
