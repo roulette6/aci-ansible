@@ -7,7 +7,8 @@ domain_type: phys
 
 ipg:
   access: single_apg
-  vpc: core-fw01_vpc
+  vpc1: core-fw01_vpc
+  vpc2: core-rt01_vpc
 
 leaf_201:
   name: leaf-201
@@ -25,13 +26,13 @@ leaf_201:
       to_port: "2"
     - ipg: single_apg
       leaf_ifp: leaf-201_ifp
-      acc_port_sel: "eth1_3_DD"
+      acc_port_sel: "eth1_3_CU"
       leaf_port_blk: block2
       from_port: "3"
       to_port: "3"
     - ipg: single_apg
       leaf_ifp: leaf-201_ifp
-      acc_port_sel: "eth1_4_DD"
+      acc_port_sel: "eth1_4_FOX"
       leaf_port_blk: block2
       from_port: "4"
       to_port: "4"
@@ -52,13 +53,13 @@ leaf_202:
       to_port: "2"
     - ipg: single_apg
       leaf_ifp: leaf-202_ifp
-      acc_port_sel: "eth1_3_DD"
+      acc_port_sel: "eth1_3_CU"
       leaf_port_blk: block2
       from_port: "3"
       to_port: "3"
     - ipg: single_apg
       leaf_ifp: leaf-202_ifp
-      acc_port_sel: "eth1_4_DD"
+      acc_port_sel: "eth1_4_FOX"
       leaf_port_blk: block2
       from_port: "4"
       to_port: "4"
@@ -78,6 +79,12 @@ leaf_201_202:
       leaf_port_blk: block2
       from_port: "1"
       to_port: "1"
+    - ipg: core-rt01_vpc
+      leaf_ifp: leaf-201_202_ifp
+      acc_port_sel: "eth1_5_core-rt01"
+      leaf_port_blk: block2
+      from_port: "5"
+      to_port: "5"
 
 tenants:
   - tenant: DiamondDogs
@@ -123,6 +130,17 @@ tenants:
         encap_id: 666
         immediacy: immediate
         pod_id: 1
+      - leafs: 201-202
+        tenant: DiamondDogs
+        bd: DD_bd
+        ap: DD_ap
+        epg: DD_epg
+        intf_type: vpc
+        intf: "eth1_1_core-rt01"
+        intf_mode: tagged
+        encap_id: 666
+        immediacy: immediate
+        pod_id: 1
 
   - tenant: CobraUnit
     encaps_block: CobraUnit
@@ -164,6 +182,16 @@ tenants:
         encap_id: 677
         immediacy: immediate
         pod_id: 1
+      - leafs: 201-202
+        tenant: CobraUnit
+        ap: Cobra_ap
+        epg: Cobra_epg
+        intf_type: vpc
+        intf: "eth1_1_core-rt01"
+        intf_mode: tagged
+        encap_id: 677
+        immediacy: immediate
+        pod_id: 1
 
   - tenant: FOX
     encaps_block: FOX
@@ -201,6 +229,16 @@ tenants:
         epg: Fox_epg
         intf_type: vpc
         intf: "eth1_1_core-fw01"
+        intf_mode: tagged
+        encap_id: 688
+        immediacy: immediate
+        pod_id: 1
+      - leafs: 201-202
+        tenant: FOX
+        ap: Fox_ap
+        epg: Fox_epg
+        intf_type: vpc
+        intf: "eth1_1_core-rt01"
         intf_mode: tagged
         encap_id: 688
         immediacy: immediate

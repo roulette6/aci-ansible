@@ -134,6 +134,11 @@
         state: present
       delegate_to: localhost
 
+    - name: Slow your role - Wait one second
+      wait_for:
+        timeout: 1
+      delegate_to: localhost
+
     - name: Create leaf interface profiles (infraAccPortP)
       aci_interface_policy_leaf_profile:
         <<: *login_info
@@ -211,18 +216,23 @@
         lldp_policy: system-lldp-enabled
         state: present
       delegate_to: localhost
+      tags: ipg
 
-    - name: Create VPC IPG
+    - name: Create VPC IPGs
       aci_interface_policy_leaf_policy_group:
         <<: *login_info
 
         annotation: "orchestrator:ansible"
         lag_type: node
-        policy_group: "{{ ipg.vpc }}"
+        policy_group: "{{ item }}"
         port_channel_policy: system-lacp-active
         lldp_policy: system-lldp-enabled
         state: present
       delegate_to: localhost
+      with_items:
+        - "{{ ipg.vpc1 }}"
+        - "{{ ipg.vpc2 }}"
+      tags: ipg
 
     - name: Slow your role - Wait one second
       wait_for:

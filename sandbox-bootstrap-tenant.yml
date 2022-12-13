@@ -134,4 +134,6 @@
         - "{{ tenants[0].static_paths }}"
         - "{{ tenants[1].static_paths }}"
         - "{{ tenants[2].static_paths }}"
+      loop_control:
+        pause: 1
       tags: spath
