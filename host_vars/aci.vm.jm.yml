@@ -1,5 +1,9 @@
 ---
 gui_alias: "ACI sandbox"
+vlan_pool: metal_gear
+aep: metal_gear
+domain_name: metal_gear
+domain_type: phys
 
 ipg:
   access: single_apg
@@ -77,8 +81,7 @@ leaf_201_202:
 
 tenants:
   - tenant: DiamondDogs
-    vlan_pool: DD_vlan-pool
-    encaps_block: core-block
+    encaps_block: DiamondDogs
     block_start: 660
     block_end: 669
     domain: DD_domain
@@ -87,7 +90,6 @@ tenants:
     bd: DD_bd
     ap: DD_ap
     epg: DD_epg
-    vlan_id: 666
     descr: "Created by Ansible for Diamond Dogs"
     static_paths:
       - leafs: 201
@@ -125,8 +127,7 @@ tenants:
         pod_id: 1
 
   - tenant: CobraUnit
-    vlan_pool: Cobra_vlan-pool
-    encaps_block: core-block
+    encaps_block: CobraUnit
     block_start: 670
     block_end: 679
     domain: Cobra_domain
@@ -135,7 +136,6 @@ tenants:
     bd: Cobra_bd
     ap: Cobra_ap
     epg: Cobra_epg
-    vlan_id: 677
     descr: "Created by Ansible for Diamond Dogs"
     static_paths:
       - leafs: 201
@@ -170,8 +170,7 @@ tenants:
         pod_id: 1
 
   - tenant: FOX
-    vlan_pool: Fox_vlan-pool
-    encaps_block: core-block
+    encaps_block: FOX
     block_start: 680
     block_end: 689
     domain: Fox_domain
@@ -180,7 +179,6 @@ tenants:
     bd: Fox_bd
     ap: Fox_ap
     epg: Fox_epg
-    vlan_id: 688
     descr: "Created by Ansible for FOX Unit"
     static_paths:
       - leafs: 201

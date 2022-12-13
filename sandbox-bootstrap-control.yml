@@ -13,7 +13,12 @@
 
 - name: "Configure fabric access policies"
   import_playbook: sandbox-bootstrap-fabric.yml
+  tags:
+    - all
+    - infra
 
 - name: "Configure tenants"
   import_playbook: sandbox-bootstrap-tenant.yml
-
+  tags:
+    - all
+    - tenant
