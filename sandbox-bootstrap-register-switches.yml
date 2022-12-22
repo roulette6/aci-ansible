@@ -164,5 +164,8 @@
 
     - name: Display fabric snapshot file name
       debug:
-        msg: "ce2_defaultOneTime-{{ snapshot.imdata[0].configExportP.attributes.modTs[:-10] | regex_replace(':', '-')}}.tar.gz"
+        msg: >-
+          ce2_defaultOneTime-{{ snapshot.imdata[0].
+          configExportP.attributes.modTs[:-10] |
+          regex_replace(':', '-')}}.tar.gz
       tags: snapshot
