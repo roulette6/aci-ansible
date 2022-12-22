@@ -135,10 +135,26 @@
                             children: []
       delegate_to: localhost
 
-    - name: Wait 85 seconds before creating fabric snapshot
+    - name: Wait 80 seconds before proceeding
       wait_for:
-        timeout: 85
+        timeout: 80
       delegate_to: localhost
+
+    - name: Set GUI timeout to 18 hrs and token timeout to 2 hrs 40 mins
+      aci_rest:
+        <<: *login_info
+
+        path: /api/node/mo/uni/userext/pkiext/webtokendata.json
+        method: post
+        content:
+          pkiWebTokenData:
+            attributes:
+              dn: uni/userext/pkiext/webtokendata
+              webtokenTimeoutSeconds: "9600"
+              uiIdleTimeoutSeconds: "64800"
+            children: []
+      delegate_to: localhost
+      tags: timeouts
 
     - name: Create fabric snapshot
       aci_rest:
