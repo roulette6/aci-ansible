@@ -21,7 +21,7 @@
       password: "{{ ansible_password }}"
       validate_certs: false
 
-    rollback_file: "ce2_defaultOneTime-2022-12-09T10-38-55.tar.gz"
+    rollback_file: "ce2_defaultOneTime-2022-12-19T04-53-19.tar.gz"
 
   tasks:
     - name: Roll back to blank slate config
@@ -59,10 +59,11 @@
               guiTextMessage: "{{ gui_alias }}"
               message: APIC - ACI sandbox
               switchMessage: Switch - ACI sandbox
-              isGuiMessageText: 'true'
-              guiMessage: ACI sandbox
+              isGuiMessageText: "true"
+              guiMessage: "ACI sandbox | user: admin password: 1234QWer"
             children: []
       delegate_to: localhost
+      tags: alias
 
 
     - name: Create VLAN pool
