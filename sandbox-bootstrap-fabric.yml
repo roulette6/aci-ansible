@@ -215,6 +215,7 @@
         lag_type: leaf
         policy_group: "{{ ipg.access }}"
         lldp_policy: system-lldp-enabled
+        aep: " {{ aep }}"
         state: present
       delegate_to: localhost
       tags: ipg
@@ -228,6 +229,7 @@
         policy_group: "{{ item }}"
         port_channel_policy: system-lacp-active
         lldp_policy: system-lldp-enabled
+        aep: " {{ aep }}"
         state: present
       delegate_to: localhost
       with_items:
