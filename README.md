@@ -9,12 +9,12 @@ Repo for testing Ansible playbooks on the ACI simulator.
     * One IPG for single ports and one for a vPC
     * One access port selector on each switch
     * One vPC port selector on the shared leaf interface profile
-3. Run __sandbox-bootstrap-tenant.yml__: This will create a tenant, VRF, BD, AP, EPG, and one static path binding per access port selector (three total)
+3. Run __sandbox-bootstrap-tenant.yml__: This will create three tenants, VRFs, BDs, APs, EPGs, and static path bindings.
 
 ```
-ansible-playbook sandbox-bootstrap-register-switches.yml --extra-vars "apic=aci.vm.jm"
+ansible-playbook sandbox-bootstrap-register-switches.yml --extra-vars "apic=aci-sandbox"
 
-ansible-playbook sandbox-bootstrap-fabric.yml --extra-vars "apic=aci.vm.jm"
+ansible-playbook sandbox-bootstrap-fabric.yml --extra-vars "apic=aci-sandbox"
 
-ansible-playbook sandbox-bootstrap-tenant.yml --extra-vars "apic=aci.vm.jm"
+ansible-playbook sandbox-bootstrap-tenant.yml --extra-vars "apic=aci-sandbox"
 ```
