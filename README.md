@@ -14,7 +14,10 @@ Repo for testing Ansible playbooks on the ACI simulator.
 ```
 ansible-playbook sandbox-bootstrap-register-switches.yml --extra-vars "apic=aci-sandbox"
 
-ansible-playbook sandbox-bootstrap-fabric.yml --extra-vars "apic=aci-sandbox"
+# running this playbook
+ansible-playbook sandbox-bootstrap-control.yml --extra-vars "apic=aci-sandbox"
 
+# is equivalent to running these two playbooks
+ansible-playbook sandbox-bootstrap-fabric.yml --extra-vars "apic=aci-sandbox"
 ansible-playbook sandbox-bootstrap-tenant.yml --extra-vars "apic=aci-sandbox"
 ```
