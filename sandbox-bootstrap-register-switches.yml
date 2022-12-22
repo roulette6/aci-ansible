@@ -6,7 +6,7 @@
 
 # ansible-playbook sandbox-bootstrap-register-switches.yml --extra-vars "apic=aci-sandbox"
 
-- name: "Register three switches"
+- name: Register three switches
   hosts: "{{ apic }}"
   ignore_errors: true
 
@@ -18,7 +18,7 @@
       validate_certs: false
 
   tasks:
-    - name: "Register leaf 201"
+    - name: Register leaf 201
       aci_rest:
         <<: *login_info
 
@@ -37,12 +37,12 @@
             children: []
       delegate_to: localhost
 
-    - name: "Wait 65 seconds to discover spine"
+    - name: Wait 65 seconds before discovering spine
       wait_for:
         timeout: 65
       delegate_to: localhost
 
-    - name: "Register spine 101"
+    - name: Register spine 101
       aci_rest:
         <<: *login_info
 
@@ -61,12 +61,12 @@
             children: []
       delegate_to: localhost
 
-    - name: "Wait 85 seconds to discover second leaf"
+    - name: Wait 85 seconds before discovering second leaf
       wait_for:
         timeout: 85
       delegate_to: localhost
 
-    - name: "Register leaf 202 and create vPC 201"
+    - name: Register leaf 202 and create vPC 201
       aci_rest:
         <<: *login_info
 
@@ -134,3 +134,35 @@
                               status: created,modified
                             children: []
       delegate_to: localhost
+
+    - name: Wait 85 seconds before creating fabric snapshot
+      wait_for:
+        timeout: 85
+      delegate_to: localhost
+
+    - name: Create fabric snapshot
+      aci_rest:
+        <<: *login_info
+
+        path: /api/node/mo/uni/fabric/configexp-defaultOneTime.json?rsp-subtree=modified
+        method: post
+        content:
+          configExportP:
+            attributes:
+              dn: uni/fabric/configexp-defaultOneTime
+              name: defaultOneTime
+              snapshot: "true"
+              targetDn: ""
+              adminSt: triggered
+              rn: configexp-defaultOneTime
+              status: created,modified
+              descr: After switch registration
+            children: []
+      delegate_to: localhost
+      register: snapshot
+      tags: snapshot
+
+    - name: Display fabric snapshot file name
+      debug:
+        msg: "ce2_defaultOneTime-{{ snapshot.imdata[0].configExportP.attributes.modTs[:-10] | regex_replace(':', '-')}}.tar.gz"
+      tags: snapshot
