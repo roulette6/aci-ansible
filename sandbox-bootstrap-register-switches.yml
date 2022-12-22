@@ -162,10 +162,14 @@
       register: snapshot
       tags: snapshot
 
-    - name: Display fabric snapshot file name
-      debug:
-        msg: >-
+    - name: Replace snapshot file name in the bootstrap fabric file
+      replace:
+        path: ./sandbox-bootstrap-fabric.yml
+        regexp: "ce2_defaultOneTime.*tar.gz"
+        replace: >-
           ce2_defaultOneTime-{{ snapshot.imdata[0].
           configExportP.attributes.modTs[:-10] |
           regex_replace(':', '-')}}.tar.gz
+        backup: false
       tags: snapshot
+      delegate_to: localhost
