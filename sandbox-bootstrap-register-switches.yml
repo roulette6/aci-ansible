@@ -8,7 +8,7 @@
 
 - name: Register three switches
   hosts: "{{ apic }}"
-  ignore_errors: true
+  ignore_errors: false
 
   vars:
     login_info: &login_info
