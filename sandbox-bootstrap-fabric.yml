@@ -21,7 +21,7 @@
       password: "{{ ansible_password }}"
       validate_certs: false
 
-    rollback_file: "ce2_defaultOneTime-2022-12-19T04-53-19.tar.gz"
+    rollback_file: "ce2_defaultOneTime-2022-12-19T07-19-45.tar.gz"
 
   tasks:
     - name: Roll back to blank slate config
@@ -91,6 +91,8 @@
         state: present
       delegate_to: localhost
       with_items: "{{ tenants }}"
+      loop_control:
+        pause: 1
 
     - name: Add AEP
       aci_aep:
@@ -135,7 +137,7 @@
         state: present
       delegate_to: localhost
 
-    - name: Slow your role - Wait one second
+    - name: Pause to prevent errors
       wait_for:
         timeout: 1
       delegate_to: localhost
@@ -154,8 +156,10 @@
         - "{{ leaf_202 }}"
         - "{{ leaf_201_202 }}"
       tags: leaf_ifp
+      loop_control:
+        pause: 1
 
-    - name: Create leaf switch profiless (infraNodeP)
+    - name: Create leaf switch profiles (infraNodeP)
       aci_switch_policy_leaf_profile:
         <<: *login_info
 

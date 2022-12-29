@@ -125,7 +125,7 @@ tenants:
         ap: DD_ap
         epg: DD_epg
         intf_type: vpc
-        intf: "eth1_1_core-fw01"
+        intf: "{{ leaf_201_202.ifps[0].acc_port_sel }}"
         intf_mode: tagged
         encap_id: 666
         immediacy: immediate
@@ -136,7 +136,7 @@ tenants:
         ap: DD_ap
         epg: DD_epg
         intf_type: vpc
-        intf: "eth1_1_core-rt01"
+        intf: "{{ leaf_201_202.ifps[1].acc_port_sel }}"
         intf_mode: tagged
         encap_id: 666
         immediacy: immediate
@@ -177,7 +177,7 @@ tenants:
         ap: Cobra_ap
         epg: Cobra_epg
         intf_type: vpc
-        intf: "eth1_1_core-fw01"
+        intf: "{{ leaf_201_202.ifps[0].acc_port_sel }}"
         intf_mode: tagged
         encap_id: 677
         immediacy: immediate
@@ -187,7 +187,7 @@ tenants:
         ap: Cobra_ap
         epg: Cobra_epg
         intf_type: vpc
-        intf: "eth1_1_core-rt01"
+        intf: "{{ leaf_201_202.ifps[1].acc_port_sel }}"
         intf_mode: tagged
         encap_id: 677
         immediacy: immediate
@@ -228,7 +228,7 @@ tenants:
         ap: Fox_ap
         epg: Fox_epg
         intf_type: vpc
-        intf: "eth1_1_core-fw01"
+        intf: "{{ leaf_201_202.ifps[0].acc_port_sel }}"
         intf_mode: tagged
         encap_id: 688
         immediacy: immediate
@@ -238,7 +238,7 @@ tenants:
         ap: Fox_ap
         epg: Fox_epg
         intf_type: vpc
-        intf: "eth1_1_core-rt01"
+        intf: "{{ leaf_201_202.ifps[1].acc_port_sel }}"
         intf_mode: tagged
         encap_id: 688
         immediacy: immediate
