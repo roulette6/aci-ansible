@@ -224,6 +224,22 @@
       delegate_to: localhost
       tags: ipg
 
+    - name: Create direct port-channel IPG
+      aci_interface_policy_leaf_policy_group:
+        <<: *login_info
+
+        annotation: "orchestrator:ansible"
+        lag_type: link
+        policy_group: "{{ item }}"
+        lldp_policy: system-lldp-enabled
+        aep: " {{ aep }}"
+        state: present
+      delegate_to: localhost
+      with_items:
+        - "{{ ipg.direct1 }}"
+        - "{{ ipg.direct2 }}"
+      tags: ipg
+
     - name: Create VPC IPGs
       aci_interface_policy_leaf_policy_group:
         <<: *login_info
@@ -282,4 +298,6 @@
         - "{{ leaf_201.ifps }}"
         - "{{ leaf_202.ifps }}"
         - "{{ leaf_201_202.ifps }}"
+      loop_control:
+        pause: 1
       tags: port
